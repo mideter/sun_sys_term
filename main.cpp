@@ -1,11 +1,19 @@
-#include "mainwindow.h"
+#include "main_window.h"
+#include "sunsystem_scene.h"
 
-#include <QApplication>
+#include <QGuiApplication>
+
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+    QGuiApplication a(argc, argv);
+
+    MainWindow mainWindow;
+
+    SunSystemScene sunSystemScene(&mainWindow);
+    mainWindow.setScene(&sunSystemScene);
+    mainWindow.resize(600, 600);
+    mainWindow.show();
+
     return a.exec();
 }

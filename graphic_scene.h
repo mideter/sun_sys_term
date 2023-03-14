@@ -3,13 +3,13 @@
 
 #include <memory>
 #include <QObject>
-#include <QOpenGLFunctions_4_3_Core>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLShaderProgram>
 
 class QOpenGLWindow;
 
-class GraphicScene : public QObject,
-                     public QOpenGLFunctions_4_3_Core
+class GraphicScene : public QObject
+                   , public QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 
@@ -20,13 +20,13 @@ public:
     QOpenGLWindow* window() const;
     QOpenGLContext* context();
     const QOpenGLContext* context() const;
-    QOpenGLShaderProgram& shaderProgram();
+    QOpenGLShaderProgram& getShaderProgram();
 
     virtual void initialize() = 0;
     virtual void paint() = 0;
 
 protected:
-    std::unique_ptr<QOpenGLShaderProgram> openGlShaderProgram = nullptr;
+    std::unique_ptr<QOpenGLShaderProgram> shaderProgram = nullptr;
 
 private:
     QOpenGLWindow *openGlWindow = nullptr;

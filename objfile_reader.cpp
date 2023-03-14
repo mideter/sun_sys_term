@@ -42,7 +42,6 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         tmp.push_back(line);
     }
 
-    //char nameofmat[200]={'\0'};
     QString materialName;
     QString textureName;
     QString textureFullPath;
@@ -81,7 +80,6 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
             ismat=false;
             isPlane=false;
             materialName = tmp[i].section("newmtl ", 0, 0, QString::SectionSkipEmpty);
-            // sscanf(tmp[i].c_str(), "newmtl %s", nameofmat);
         }
         else if(tmp[i][0]=='N' && tmp[i][1]=='s')
             sscanf(tmp[i].toStdString().c_str(),"Ns %f", &ns);

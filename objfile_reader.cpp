@@ -60,10 +60,10 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
 
     for(uint i = 0; i < tmp.size(); i++)
     {
-        if(materialStr.size() == 0 || tmp[i][0]=='#')
+        if(materialStr.size() == 0 || tmp[i].startsWith("#"))
             continue;
 
-        if(tmp[i][0]=='n' && tmp[i][1]=='e' && tmp[i][2]=='w')
+        if(tmp[i].startsWith("newtml "))
         {
             if (ismat)
             {
@@ -81,32 +81,32 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
             isPlane=false;
             materialName = tmp[i].section("newmtl ", 0, 0, QString::SectionSkipEmpty);
         }
-        else if(tmp[i][0]=='N' && tmp[i][1]=='s')
+        else if(tmp[i].startsWith("Ns "))
             sscanf(tmp[i].toStdString().c_str(),"Ns %f", &ns);
-        else if(tmp[i][0]=='K' && tmp[i][1]=='a')
+        else if(tmp[i].startsWith("Ka "))
             sscanf(tmp[i].toStdString().c_str(),"Ka %f %f %f", &amb[0], &amb[1], &amb[2]);
-        else if(tmp[i][0]=='K' && tmp[i][1]=='d')
+        else if(tmp[i].startsWith("Kd "))
             sscanf(tmp[i].toStdString().c_str(),"Kd %f %f %f", &dif[0], &dif[1], &dif[2]);
-        else if(tmp[i][0]=='K' && tmp[i][1]=='s')
+        else if(tmp[i].startsWith("Ks "))
             sscanf(tmp[i].toStdString().c_str(),"Ks %f %f %f", &spec[0], &spec[1], &spec[2]);
-        else if(tmp[i][0]=='K' && tmp[i][1]=='e')
+        else if(tmp[i].startsWith("Ke "))
             sscanf(tmp[i].toStdString().c_str(),"Ke %f %f %f", &emis[0], &emis[1], &emis[2]);
-        else if(tmp[i][0]=='N' && tmp[i][1]=='i')
+        else if(tmp[i].startsWith("Ni "))
             sscanf(tmp[i].toStdString().c_str(),"Ni %f", &ni);
-        else if(tmp[i][0]=='d' && tmp[i][1]==' ')
+        else if(tmp[i].startsWith("d "))
             sscanf(tmp[i].toStdString().c_str(),"d %f", &alpha);
-        else if(tmp[i][0]=='i' && tmp[i][1]=='l')
+        else if(tmp[i].startsWith("illum "))
         {
             sscanf(tmp[i].toStdString().c_str(),"illum %d", &illum);
             ismat=true;
         }
-        else if(tmp[i][0]=='i' && tmp[i][1]=='s' && tmp[i][2]=='P')
+        else if(tmp[i].startsWith("isPlane "))
         {
             int t;
             sscanf(tmp[i].toStdString().c_str(), "isPlane %d", &t);
             isPlane = t;
         }
-        else if(tmp[i][0]=='m' && tmp[i][1]=='a')
+        else if(tmp[i].startsWith("map_Kd "))
         {
      //     sscanf(tmp[i].c_str(), "map_Kd %s", textureName);
 
@@ -132,30 +132,30 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, 0, isPlane });
 }
 
-void ObjFileReader::handleFileString(std::string fileStr)
+void ObjFileReader::handleFileString(QString fileStr)
 {
-    if(fileStr.empty() || fileStr[0] == '#')
+    if(fileStr.isEmpty() || fileStr.startsWith("#"))
         return;
 
-    if(fileStr[0] == 'v' && fileStr[1] == ' ')
+    if(fileStr.startsWith("v "))
     {
         float tmpx, tmpy, tmpz;
-        sscanf(fileStr.c_str(), "v %f %f %f", &tmpx,&tmpy,&tmpz);
+        sscanf(fileStr.toStdString().c_str(), "v %f %f %f", &tmpx,&tmpy,&tmpz);
         vertexPositions.push_back(QVector3D(tmpx, tmpy, tmpz));
     }
-    else if(fileStr[0] == 'v' && fileStr[1] =='t')
+    else if(fileStr.startsWith("vt "))
     {
         float tmpx, tmpy;
-        sscanf(fileStr.c_str(), "vt %f %f", &tmpx, &tmpy);
+        sscanf(fileStr.toStdString().c_str(), "vt %f %f", &tmpx, &tmpy);
         vertexTexturePositions.push_back(QVector2D{tmpx, tmpy});
     }
-    else if(fileStr[0] == 'v' && fileStr[1] == 'n')
+    else if(fileStr.startsWith("vn "))
     {
         float tmpx, tmpy, tmpz;
-        sscanf(fileStr.c_str(), "vn %f %f %f", &tmpx,&tmpy,&tmpz);
+        sscanf(fileStr.toStdString().c_str(), "vn %f %f %f", &tmpx,&tmpy,&tmpz);
         vertexNormals.push_back(QVector3D(tmpx, tmpy, tmpz));
     }
-    else if(fileStr[0] == 'f')
+    else if(fileStr.startsWith("f "))
     {
         int v[3];
         int n[3];
@@ -168,13 +168,13 @@ void ObjFileReader::handleFileString(std::string fileStr)
         }
 
         bool textureUse = false;
-        if(fileStr.find("//")!=std::string::npos)
+        if(fileStr.indexOf("//") != -1)
         {
-            sscanf(fileStr.c_str(),"f %d//%d %d//%d %d//%d", &v[0], &n[0],  &v[1], &n[1], &v[2], &n[2] );
+            sscanf(fileStr.toStdString().c_str(),"f %d//%d %d//%d %d//%d", &v[0], &n[0],  &v[1], &n[1], &v[2], &n[2] );
         }
-        else if(fileStr.find("/")!=std::string::npos)
+        else if(fileStr.indexOf("/") != -1)
         {
-            sscanf(fileStr.c_str(),"f %d/%d/%d %d/%d/%d %d/%d/%d", &v[0], &t[0], &n[0],  &v[1], &t[1], &n[1],  &v[2], &t[2], &n[2] );
+            sscanf(fileStr.toStdString().c_str(),"f %d/%d/%d %d/%d/%d %d/%d/%d", &v[0], &t[0], &n[0],  &v[1], &t[1], &n[1],  &v[2], &t[2], &n[2] );
             textureUse = true;
         }
         else
@@ -201,12 +201,12 @@ void ObjFileReader::handleFileString(std::string fileStr)
 
         faces.push_back(FaceObjFile{ tmpVec, currentMaterial });
     }
-    else if(fileStr[0] == 'm' && fileStr[1] == 't' && fileStr[2] == 'l' && fileStr[3] == 'l')
-        readStringWithMaterialInfo(fileStr.c_str());
-    else if(fileStr[0] == 'u' && fileStr[1] == 's' && fileStr[2] == 'e')
+    else if(fileStr.startsWith("mtllib "))
+        readStringWithMaterialInfo(fileStr);
+    else if(fileStr.startsWith("usemtl "))
     {
         char tmp[200];
-        sscanf(fileStr.c_str(), "usemtl %s", tmp);
+        sscanf(fileStr.toStdString().c_str(), "usemtl %s", tmp);
 
         for( int j = 0; j < materials.size(); j++)
         {
@@ -264,7 +264,7 @@ void ObjFileReader::handleFile(QString filePath)
 
     for(int i = 0; i < fileStrings.size(); i++)
     {
-        handleFileString(fileStrings[i].toStdString());
+        handleFileString(fileStrings[i]);
     }
 }
 

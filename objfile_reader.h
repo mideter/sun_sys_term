@@ -65,7 +65,7 @@ class ObjFileReader
 
     QVector<QString> readFile(QString filePath);
     void handleFile(QString filePath);
-    void handleFileString(std::string str);
+    void handleFileString(QString str);
     void readStringWithMaterialInfo(QString materialStr);
     void someProcessWithMaterial(const MaterialObjFile &material, Model3DObject *M, const uint matIndex);
 

@@ -9,6 +9,7 @@
 #include <QVector2D>
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
+#include <QOpenGLTexture>
 
 
 class SunSystemScene : public GraphicScene
@@ -34,6 +35,7 @@ private:
     std::unique_ptr<Model3DObject> earth3DModel;
 
     QOpenGLBuffer vertexBuffer;
+    std::unique_ptr<QOpenGLTexture> texture = nullptr;
 };
 
 

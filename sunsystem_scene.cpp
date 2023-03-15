@@ -3,6 +3,7 @@
 
 #include <QOpenGLWindow>
 
+
 SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     : GraphicScene(window)
     , vertexBuffer(QOpenGLBuffer::VertexBuffer)
@@ -22,7 +23,7 @@ void SunSystemScene::initialize()
     GraphicScene::initialize();
     glClearColor(0, 0, 0, 0);
 
-    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/phong.vert");
+    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":phong.vert");
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":phong.frag");
     shaderProgram->link();
 
@@ -32,14 +33,22 @@ void SunSystemScene::initialize()
     shaderProgram->setUniformValue("light.intensity", QVector3D(1, 1, 1));
 
     vertexBuffer.create();
-    vertexBuffer.bind();
+    vertexBuffer.bind(); // bind() must be called before allocate()
     vertexBuffer.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
 
-    shaderProgram->setAttributeBuffer("Vertex", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("Vertex");
+    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->enableAttributeArray("vertexPosition");
 
-    shaderProgram->setAttributeBuffer("Normal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("Normal");
+    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->enableAttributeArray("vertexNormal");
+
+    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTexturePositionAttribOffset(), 2, sizeof(Vertex));
+    shaderProgram->enableAttributeArray("vertexTextureCoord");
+
+    texture.reset( new QOpenGLTexture{ earth3DModel->getMainTexture().mirrored() } );
+    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+    texture->bind();
 }
 
 

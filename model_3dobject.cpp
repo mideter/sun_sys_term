@@ -21,6 +21,12 @@ LightInteractingMaterial Model3DObject::getMainMaterial() const
 }
 
 
+QImage Model3DObject::getMainTexture() const
+{
+    return surfaces[0].getTexture();
+}
+
+
 Vertex* Model3DObject::vertexData()
 {
     return surfaces[0].vertexData();
@@ -32,9 +38,11 @@ SurfaceWithOneMaterial::SurfaceWithOneMaterial(const LightInteractingMaterial &m
 {}
 
 
-SurfaceWithOneMaterial::SurfaceWithOneMaterial(const LightInteractingMaterial &material, const QVector<Face3v> &faces)
-    : material(material),
-      faces(faces)
+SurfaceWithOneMaterial::SurfaceWithOneMaterial(const LightInteractingMaterial &material, const QVector<Face3v> &faces,
+                                               const QImage &texture)
+    : material(material)
+    , faces(faces)
+    , texture(texture)
 {
     // TODO сделать проверку инварианта.
 }
@@ -43,6 +51,12 @@ SurfaceWithOneMaterial::SurfaceWithOneMaterial(const LightInteractingMaterial &m
 void SurfaceWithOneMaterial::setMaterial(const LightInteractingMaterial &material)
 {
     this->material = material;
+}
+
+
+void SurfaceWithOneMaterial::setTexture(const QImage &texture)
+{
+    this->texture = texture;
 }
 
 
@@ -61,6 +75,12 @@ int SurfaceWithOneMaterial::getCountVertexes() const
 LightInteractingMaterial SurfaceWithOneMaterial::getMaterial() const
 {
     return material;
+}
+
+
+QImage SurfaceWithOneMaterial::getTexture() const
+{
+    return texture;
 }
 
 

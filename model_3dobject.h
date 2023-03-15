@@ -4,6 +4,7 @@
 #include <QVector>
 #include <QVector2D>
 #include <QVector3D>
+#include <QImage>
 #include <QtGui/qopengl.h>
 
 class QOpenGLShaderProgram;
@@ -75,23 +76,21 @@ class SurfaceWithOneMaterial
 private:
     LightInteractingMaterial material;
     QVector<Face3v> faces;
-
- // QVector<int> firstIndexesOfVao;
- // QVector<int> countVertexesInVao;
-
- // GLuint mainVao; // Все VAO материалов находится в одном главном VAO
+    QImage texture;
 
 public:
     SurfaceWithOneMaterial() = default;
     explicit SurfaceWithOneMaterial(const LightInteractingMaterial &material);
-    SurfaceWithOneMaterial(const LightInteractingMaterial &material, const QVector<Face3v> &faces);
+    SurfaceWithOneMaterial(const LightInteractingMaterial &material, const QVector<Face3v> &faces, const QImage &texture = QImage());
     ~SurfaceWithOneMaterial() = default;
 
     void setMaterial(const LightInteractingMaterial &material);
+    void setTexture(const QImage &texture);
     void addFace(const Face3v &face);
 
     int getCountVertexes() const;
     LightInteractingMaterial getMaterial() const;
+    QImage getTexture() const;
 
     Vertex* vertexData();
 };
@@ -107,6 +106,8 @@ public:
 
     std::size_t getCountVertexes() const;
     LightInteractingMaterial getMainMaterial() const;
+    QImage getMainTexture() const;
+
     Vertex* vertexData();
 };
 

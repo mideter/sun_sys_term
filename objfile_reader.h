@@ -4,7 +4,7 @@
 #include <QVector>
 #include <QVector2D>
 #include <QVector3D>
-#include <QPixmap>
+#include <QImage>
 
 #include "model_3dobject.h"
 
@@ -42,7 +42,7 @@ struct MaterialObjFile
     QVector3D em;
 
     int illum;
-    QPixmap texture;
+    QImage texture;
 
     bool isPlane;
 };
@@ -61,7 +61,7 @@ class ObjFileReader
     QVector<QVector2D> vertexTexturePositions;
     QVector<QVector3D> vertexNormals;
 
-    QVector<QPixmap> texturePixmaps;
+    QVector<QImage> texturePixmaps;
     QVector<QString> textureNames;
 
     QVector<QString> readFile(QString filePath);
@@ -69,6 +69,7 @@ class ObjFileReader
     void handleFileString(QString str);
     void readStringWithMaterialInfo(QString materialStr);
     void someProcessWithMaterial(const MaterialObjFile &material, Model3DObject *M, const uint matIndex);
+    QVector<Face3v> getFacesForMaterial(const uint matIndex) const;
 
     Model3DObject *createModel3DObject();
 

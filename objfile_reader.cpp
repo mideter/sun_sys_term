@@ -24,8 +24,7 @@ QString getFileDirectoryFromFilePath(QString filePath)
 
 void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
 {
-    char  mtlName[64]={'\0'};
-    sscanf(materialStr.toStdString().c_str(), "mtllib %s", mtlName);
+    QString mtlName = materialStr.section("mtllib ", 0, 0, QString::SectionSkipEmpty);
     QString materialFilePath = directoryPath + mtlName;
 
     QFile materialFile(materialFilePath);
@@ -44,7 +43,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
     }
 
     QString materialName;
-    QPixmap texturePix;
+    QImage texturePix;
 
     QVector3D amb;
     QVector3D dif;
@@ -62,7 +61,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         if(materialStr.size() == 0 || tmp[i].startsWith("#"))
             continue;
 
-        if(tmp[i].startsWith("newtml "))
+        if(tmp[i].startsWith("newmtl "))
         {
             if (ismat)
                 materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
@@ -107,7 +106,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
             }
             else
             {
-                texturePix = QPixmap(directoryPath + textureName);
+                texturePix = QImage(directoryPath + textureName);
                 // TODO: сделать проверку загрузки текстуры.
                 texturePixmaps.push_back(texturePix);
                 textureNames.push_back(textureName);
@@ -214,8 +213,17 @@ void ObjFileReader::someProcessWithMaterial(const MaterialObjFile &material, Mod
     QVector3D sp(material.sp[0], material.sp[1], material.sp[2]);
     QVector3D em(material.em[0], material.em[1], material.em[2]);
 
-    SurfaceWithOneMaterial surfaceWithOneMaterial(LightInteractingMaterial{ am, di, sp, em, material.ns });
+    // TODO: нужно сделать, чтобы работало более, чем с одной текстурой в 3д модели.
+    SurfaceWithOneMaterial surfaceWithOneMaterial( LightInteractingMaterial{ am, di, sp, em, material.ns },
+                                                   getFacesForMaterial(matIndex),
+                                                   texturePixmaps[0] );
+    M->addSurface(surfaceWithOneMaterial);
+}
 
+
+QVector<Face3v> ObjFileReader::getFacesForMaterial(const uint matIndex) const
+{
+    QVector<Face3v> facesOfOneMaterial;
     for (auto objFace : faces)
     {
         if (objFace.materialId == matIndex)
@@ -229,11 +237,10 @@ void ObjFileReader::someProcessWithMaterial(const MaterialObjFile &material, Mod
                 tmpVertexVector.push_back( Vertex{ position, texturePosition, normal } );
             }
 
-            surfaceWithOneMaterial.addFace(Face3v(tmpVertexVector));
+            facesOfOneMaterial.push_back(Face3v(tmpVertexVector));
         }
     }
-
-    M->addSurface(surfaceWithOneMaterial);
+    return facesOfOneMaterial;
 }
 
 

@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
+#include <QPixmap>
 
 #include "sst_exeption.h"
 
@@ -43,8 +44,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
     }
 
     QString materialName;
-    QString textureName;
-    QString textureFullPath;
+    QPixmap texturePix;
 
     QVector3D amb;
     QVector3D dif;
@@ -54,9 +54,8 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
     float alpha, ns, ni;
     int illum;
 
-    GLuint textureId;
     bool isPlane;
-    bool ismat=false;
+    bool ismat = false;
 
     for(uint i = 0; i < tmp.size(); i++)
     {
@@ -66,19 +65,10 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         if(tmp[i].startsWith("newtml "))
         {
             if (ismat)
-            {
-                if (textureName.isEmpty())
-                    materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, 0, isPlane });
-                else
-                {
-                    materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, textureId, isPlane });
-                    textureName.clear();
-                    textureFullPath.clear();
-                }
-            }
+                materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
 
-            ismat=false;
-            isPlane=false;
+            ismat = false;
+            isPlane = false;
             materialName = tmp[i].section("newmtl ", 0, 0, QString::SectionSkipEmpty);
         }
         else if(tmp[i].startsWith("Ns "))
@@ -98,7 +88,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         else if(tmp[i].startsWith("illum "))
         {
             sscanf(tmp[i].toStdString().c_str(),"illum %d", &illum);
-            ismat=true;
+            ismat = true;
         }
         else if(tmp[i].startsWith("isPlane "))
         {
@@ -108,28 +98,26 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         }
         else if(tmp[i].startsWith("map_Kd "))
         {
-     //     sscanf(tmp[i].c_str(), "map_Kd %s", textureName);
+            QString textureName = tmp[i].section("map_Kd ", 0, 0, QString::SectionSkipEmpty);
 
-     //     int texIndex = textureNames.indexOf(textureName);
-     //     if (texIndex != -1)
-     //     {
-     //         textureId = textureIds[texIndex];
-     //     }
-     //     else
-     //     {
-     //         textureFullPath = DirectionFiles;
-     //         textureFullPath += textureName;
-     //         textureId = loadTexture(textureFullPath);
-     //         // TODO: сделать проверку загрузки текстуры.
-     //         textureIds.push_back(textureId);
-     //         textureNames.push_back(textureName);
-     //     }
-     //     ismat=true;
+            int texIndex = textureNames.indexOf(textureName);
+            if (texIndex != -1)
+            {
+                texturePix = texturePixmaps[texIndex];
+            }
+            else
+            {
+                texturePix = QPixmap(directoryPath + textureName);
+                // TODO: сделать проверку загрузки текстуры.
+                texturePixmaps.push_back(texturePix);
+                textureNames.push_back(textureName);
+            }
+            ismat = true;
         }
     }
 
     if (ismat)
-        materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, 0, isPlane });
+        materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
 }
 
 void ObjFileReader::handleFileString(QString fileStr)
@@ -205,8 +193,7 @@ void ObjFileReader::handleFileString(QString fileStr)
         readStringWithMaterialInfo(fileStr);
     else if(fileStr.startsWith("usemtl "))
     {
-        char tmp[200];
-        sscanf(fileStr.toStdString().c_str(), "usemtl %s", tmp);
+        QString tmp = fileStr.section("usemtl ", 0, 0, QString::SectionSkipEmpty);
 
         for( int j = 0; j < materials.size(); j++)
         {

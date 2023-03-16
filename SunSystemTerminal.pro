@@ -24,8 +24,9 @@ TRANSLATIONS += \
     SunSystemTerminal_en_US.ts
 
 DISTFILES += \
-    phong.frag \
-    phong.vert
+    fragment.shader \
+    phong.vert \
+    vertex.shader
 
 RESOURCES += \
     resources.qrc

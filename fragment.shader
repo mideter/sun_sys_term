@@ -1,4 +1,10 @@
-#version 330
+#version 300 es
+// Директивы #undef добавлены, чтобы нейтрализировать автосоздаваемые #define для нейтрализации указателей точности.
+#undef lowp
+#undef mediump
+#undef highp
+
+precision mediump float;
 
 struct Material {
     lowp vec3 ka;
@@ -6,6 +12,7 @@ struct Material {
     lowp vec3 ks;
     lowp float shininess;
 };
+
 
 struct Light {
     lowp vec3 position;
@@ -15,12 +22,13 @@ struct Light {
 uniform Material mat;
 uniform Light light;
 
-uniform sampler2D textureSampler;
+uniform lowp sampler2D textureSampler;
 
-varying mediump vec3 normal;
-varying highp vec3 position;
-varying mediump vec2 textureCoord;
+in mediump vec3 normal;
+in highp vec3 position;
+in mediump vec2 textureCoord;
 
+out mediump vec4 glFragColor;
 
 void ads(out vec3 ambAndDiff, out vec3 specular)
 {
@@ -47,25 +55,11 @@ void ads(out vec3 ambAndDiff, out vec3 specular)
 
 
 void main(void) {
-  /*  vec3 n = normalize(N);
-    vec3 L = normalize(light.position.xyz - v);
-    vec3 E = normalize(-v);
-    vec3 R = normalize(reflect(-L, n));
-
-    float LdotN = dot(L, n);
-    float diffuse = max(LdotN, 0.0);
-    vec3 spec = vec3(0, 0, 0);
-
-    if(LdotN > 0.0) {
-        float RdotE = max(dot(R, E), 0.0);
-        spec = light.intensity * pow(RdotE, mat.shininess);
-    }
-*/
     vec3 ambientAndDiffuse;
     vec3 spec;
     ads(ambientAndDiffuse, spec);
 
-    vec4 textureColor = texture( textureSampler, textureCoord );
+    vec4 textColor = texture2D( textureSampler, textureCoord );
 
-    gl_FragColor = vec4(ambientAndDiffuse, 1.0) * textureColor + vec4(spec, 1.0);
+    glFragColor = vec4(ambientAndDiffuse, 1.0) * textColor + vec4(spec, 1.0);
 }

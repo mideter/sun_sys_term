@@ -23,8 +23,8 @@ void SunSystemScene::initialize()
     GraphicScene::initialize();
     glClearColor(0, 0, 0, 0);
 
-    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":phong.vert");
-    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":phong.frag");
+    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":vertex.shader");
+    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":fragment.shader");
     shaderProgram->link();
 
     shaderProgram->bind();

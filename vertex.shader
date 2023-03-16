@@ -1,17 +1,17 @@
-#version 330
+#version 300 es
 
 uniform highp mat4 modelViewMatrix;
 uniform highp mat3 normalMatrix;
 uniform highp mat4 projectionMatrix;
 uniform highp mat4 mvpMatrix;
 
-attribute highp vec3 vertexPosition;
-attribute mediump vec3 vertexNormal;
-attribute mediump vec2 vertexTextureCoord;
+layout(location = 0) in highp vec3 vertexPosition;
+layout(location = 1) in mediump vec3 vertexNormal;
+layout(location = 2) in mediump vec2 vertexTextureCoord;
 
-varying mediump vec3 normal;
-varying highp vec3 position;
-varying mediump vec2 textureCoord;
+out mediump vec3 normal;
+out highp vec3 position;
+out mediump vec2 textureCoord;
 
 
 void main(void) {

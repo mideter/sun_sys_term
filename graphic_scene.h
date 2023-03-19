@@ -3,13 +3,13 @@
 
 #include <memory>
 #include <QObject>
-#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 
 class QOpenGLWindow;
 
 class GraphicScene : public QObject
-                   , public QOpenGLFunctions_3_3_Core
+                   , public QOpenGLFunctions
 {
     Q_OBJECT
 

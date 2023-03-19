@@ -1,8 +1,4 @@
 #version 300 es
-// Директивы #undef добавлены, чтобы нейтрализировать автосоздаваемые #define для нейтрализации указателей точности.
-#undef lowp
-#undef mediump
-#undef highp
 
 precision mediump float;
 

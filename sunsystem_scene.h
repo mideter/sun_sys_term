@@ -10,11 +10,14 @@
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
 #include <QOpenGLTexture>
+#include <QPropertyAnimation>
 
 
 class SunSystemScene : public GraphicScene
 {
     Q_OBJECT
+
+    Q_PROPERTY(float angleByEarthAxis MEMBER angleByEarthAxis)
 
 public:
     explicit SunSystemScene(QOpenGLWindow *window);
@@ -36,6 +39,9 @@ private:
 
     QOpenGLBuffer vertexBuffer;
     std::unique_ptr<QOpenGLTexture> texture = nullptr;
+
+    float angleByEarthAxis;
+    QPropertyAnimation rotationByEarthAxis;
 };
 
 

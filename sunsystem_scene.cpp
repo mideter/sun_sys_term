@@ -7,9 +7,16 @@
 SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     : GraphicScene(window)
     , vertexBuffer(QOpenGLBuffer::VertexBuffer)
+    , rotationByEarthAxis(this, "angleByEarthAxis")
 {
     vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     initializeObjectData();
+
+    rotationByEarthAxis.setStartValue(0);
+    rotationByEarthAxis.setEndValue(359);
+    rotationByEarthAxis.setDuration(360000);
+    rotationByEarthAxis.setLoopCount(-1);
+    rotationByEarthAxis.start();
 }
 
 
@@ -35,7 +42,6 @@ void SunSystemScene::initialize()
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":fragment.shader");
     shaderProgram->link();
 
-    bool isOpenGLES = context()->isOpenGLES();
     shaderProgram->bind();
 
     shaderProgram->setUniformValue("light.position", QVector3D(2, 1, 1));
@@ -80,6 +86,7 @@ void SunSystemScene::paint()
     glCullFace(GL_BACK);
 
     modelMatrix.setToIdentity();
+    modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
     paintObject(modelViewMatrix);
 }

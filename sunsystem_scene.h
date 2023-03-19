@@ -18,7 +18,7 @@ class SunSystemScene : public GraphicScene
 
 public:
     explicit SunSystemScene(QOpenGLWindow *window);
-    ~SunSystemScene() = default;
+    ~SunSystemScene();
 
     void initialize() override;
     void paint() override;

@@ -12,6 +12,14 @@ SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     initializeObjectData();
 }
 
+
+SunSystemScene::~SunSystemScene()
+{
+    // Makes current window context to correct deleting OpenGL resources.
+    window()->makeCurrent();
+}
+
+
 void SunSystemScene::initializeObjectData()
 {
     ObjFileReader objFileReader;
@@ -27,6 +35,7 @@ void SunSystemScene::initialize()
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":fragment.shader");
     shaderProgram->link();
 
+    bool isOpenGLES = context()->isOpenGLES();
     shaderProgram->bind();
 
     shaderProgram->setUniformValue("light.position", QVector3D(2, 1, 1));

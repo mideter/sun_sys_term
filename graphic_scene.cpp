@@ -9,7 +9,10 @@ GraphicScene::GraphicScene(QOpenGLWindow *window)
 
 
 GraphicScene::~GraphicScene()
-{}
+{
+    // Makes current window context to correct deleting OpenGL resources.
+    window()->makeCurrent();
+}
 
 
 void GraphicScene::initialize()

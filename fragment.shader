@@ -2,6 +2,7 @@
 
 precision mediump float;
 
+
 struct Material {
     lowp vec3 ka;
     lowp vec3 kd;
@@ -15,16 +16,21 @@ struct Light {
     lowp vec3 intensity;
 };
 
+
 uniform Material mat;
 uniform Light light;
 
+
 uniform lowp sampler2D textureSampler;
+
 
 in mediump vec3 normal;
 in highp vec3 position;
 in mediump vec2 textureCoord;
 
+
 out mediump vec4 glFragColor;
+
 
 void ads(out vec3 ambAndDiff, out vec3 specular)
 {

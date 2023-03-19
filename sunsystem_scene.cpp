@@ -44,8 +44,8 @@ void SunSystemScene::initialize()
 
     shaderProgram->bind();
 
-    shaderProgram->setUniformValue("light.position", QVector3D(2, 1, 1));
-    shaderProgram->setUniformValue("light.intensity", QVector3D(1, 1, 1));
+    shaderProgram->setUniformValue("light.position", QVector3D(0.1, 0.1, 0.1));
+    shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
 
     vertexBuffer.create();
     vertexBuffer.bind(); // bind() must be called before allocate()
@@ -82,8 +82,9 @@ void SunSystemScene::paint()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window()->width(), window()->height());
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+
+    glEnable(GL_CULL_FACE); // Включаем отсечение граней.
+    glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
 
     modelMatrix.setToIdentity();
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});

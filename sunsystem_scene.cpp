@@ -70,7 +70,7 @@ void SunSystemScene::paint()
 {
     projectionMatrix.setToIdentity();
     float aspectRatio = qreal(window()->width()) / window()->height();
-    projectionMatrix.perspective(90, aspectRatio, 0.5, 40);
+    projectionMatrix.perspective(45.0f, aspectRatio, 0.1, 10000.0f);
 
     viewMatrix.setToIdentity();
     QVector3D up(0, 1.0f, 0);

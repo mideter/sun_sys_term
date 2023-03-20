@@ -5,7 +5,7 @@
 #include <QPropertyAnimation>
 
 
-class GraphicScene;
+class SunSystemScene;
 
 class MainWindow : public QOpenGLWindow
 {
@@ -20,12 +20,15 @@ public:
     void initializeGL() override;
     void paintGL() override;
 
-    GraphicScene* scene();
-    void setScene(GraphicScene *scene);
+    SunSystemScene* scene();
+    void setScene(SunSystemScene *scene);
+
+protected:
+    void keyPressEvent(QKeyEvent *ev) override;
 
 private:
     QPropertyAnimation windowUpdateAnimation;
-    GraphicScene *graphicScene = nullptr;
+    SunSystemScene *graphicScene = nullptr;
 
     const int fpsSetting;
     int framesCount;

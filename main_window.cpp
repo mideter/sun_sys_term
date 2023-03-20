@@ -1,5 +1,7 @@
 #include "main_window.h"
-#include "graphic_scene.h"
+#include "sunsystem_scene.h"
+
+#include <QKeyEvent>
 
 
 MainWindow::MainWindow(QWindow *parent)
@@ -45,13 +47,31 @@ void MainWindow::setframesCount(int val)
 }
 
 
-GraphicScene* MainWindow::scene()
+SunSystemScene* MainWindow::scene()
 {
     return graphicScene;
 }
 
 
-void MainWindow::setScene(GraphicScene *scene)
+void MainWindow::setScene(SunSystemScene *scene)
 {
     graphicScene = scene;
+}
+
+
+void MainWindow::keyPressEvent(QKeyEvent *ev)
+{
+    QVector<int> keysToMoveForward{ Qt::Key_W, Qt::Key_Up };
+    QVector<int> keysToMoveBack{ Qt::Key_S, Qt::Key_Down };
+    QVector<int> keysToMoveLeft{ Qt::Key_A, Qt::Key_Left };
+    QVector<int> keysToMoveRight{ Qt::Key_D, Qt::Key_Right };
+
+    if( keysToMoveForward.contains(ev->key()))
+        graphicScene->cameraMoveForward();
+    else if (keysToMoveBack.contains(ev->key()))
+        graphicScene->cameraMoveBack();
+    else if (keysToMoveLeft.contains(ev->key()))
+        graphicScene->cameraMoveLeft();
+    else if (keysToMoveRight.contains(ev->key()))
+        graphicScene->cameraMoveRight();
 }

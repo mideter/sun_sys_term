@@ -26,6 +26,11 @@ public:
     void initialize() override;
     void paint() override;
 
+    virtual void cameraMoveForward();
+    virtual void cameraMoveBack();
+    virtual void cameraMoveLeft();
+    virtual void cameraMoveRight();
+
 protected:
     void initializeObjectData();
     void paintObject(const QMatrix4x4 &mvMatrix);
@@ -42,6 +47,8 @@ private:
 
     float angleByEarthAxis;
     QPropertyAnimation rotationByEarthAxis;
+
+    QVector3D cameraPosition;
 };
 
 

@@ -83,7 +83,7 @@ void SunSystemScene::paint()
     glEnable(GL_CULL_FACE); // Включаем отсечение граней.
     glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
 
-    shaderProgram->setUniformValue("light.position", viewMatrix * QVector3D(6, 6, 10) );
+    shaderProgram->setUniformValue("light.position", viewMatrix * QVector3D(16, 6, 6) );
     shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
 
     modelMatrix.setToIdentity();
@@ -113,30 +113,34 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
 void SunSystemScene::cameraMoveForward()
 {
     float delta = -0.1;
-    cameraPosition += QVector3D( 0.0f, 0.0f, delta);
-    cameraDirection += QVector3D( 0.0f, 0.0f, delta);
+    cameraMove(QVector3D( 0.0f, 0.0f, delta));
 }
 
 
 void SunSystemScene::cameraMoveBack()
 {
     float delta = 0.1;
-    cameraPosition += QVector3D( 0.0f, 0.0f, delta);
-    cameraDirection += QVector3D( 0.0f, 0.0f, delta);
+    cameraMove(QVector3D( 0.0f, 0.0f, delta));
 }
 
 
 void SunSystemScene::cameraMoveLeft()
 {
     float delta = -0.1;
-    cameraPosition += QVector3D( delta, 0.0f, 0.0f);
-    cameraDirection += QVector3D( delta, 0.0f, 0.0f);
+    cameraMove(QVector3D( delta, 0.0f, 0.0f));
 }
 
 
 void SunSystemScene::cameraMoveRight()
 {
     float delta = 0.1;
-    cameraPosition += QVector3D( delta, 0.0f, 0.0f);
-    cameraDirection += QVector3D( delta, 0.0f, 0.0f);
+    cameraMove(QVector3D( delta, 0.0f, 0.0f));
+}
+
+
+void SunSystemScene::cameraMove(const QVector3D deltaToMove)
+{
+    cameraPosition += deltaToMove;
+    cameraDirection += deltaToMove;
+
 }

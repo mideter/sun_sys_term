@@ -50,6 +50,8 @@ private:
 
     QVector3D cameraPosition;
     QVector3D cameraDirection;
+
+    void cameraMove(const QVector3D deltaToMove);
 };
 
 

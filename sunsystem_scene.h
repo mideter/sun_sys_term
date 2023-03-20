@@ -49,6 +49,7 @@ private:
     QPropertyAnimation rotationByEarthAxis;
 
     QVector3D cameraPosition;
+    QVector3D cameraDirection;
 };
 
 

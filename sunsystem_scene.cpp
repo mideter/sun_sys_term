@@ -9,6 +9,7 @@ SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     , vertexBuffer(QOpenGLBuffer::VertexBuffer)
     , rotationByEarthAxis(this, "angleByEarthAxis")
     , cameraPosition( 3.0f, 3.0f, 13.0f)
+    , cameraDirection(0.0f, 0.0f, 0.0f)
 {
     vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     initializeObjectData();
@@ -72,10 +73,8 @@ void SunSystemScene::paint()
     projectionMatrix.perspective(90, aspectRatio, 0.5, 40);
 
     viewMatrix.setToIdentity();
-    QVector3D eye{ cameraPosition };
-    QVector3D center(0, 0, 0);
-    QVector3D up(0, 1, 0);
-    viewMatrix.lookAt(eye, center, up);
+    QVector3D up(0, 1.0f, 0);
+    viewMatrix.lookAt(cameraPosition, cameraDirection, up);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window()->width(), window()->height());
@@ -113,23 +112,31 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
 
 void SunSystemScene::cameraMoveForward()
 {
-    cameraPosition += QVector3D( 0.0f, 0.0f,-0.1f);
+    float delta = -0.1;
+    cameraPosition += QVector3D( 0.0f, 0.0f, delta);
+    cameraDirection += QVector3D( 0.0f, 0.0f, delta);
 }
 
 
 void SunSystemScene::cameraMoveBack()
 {
-    cameraPosition += QVector3D( 0.0f, 0.0f, 0.1f);
+    float delta = 0.1;
+    cameraPosition += QVector3D( 0.0f, 0.0f, delta);
+    cameraDirection += QVector3D( 0.0f, 0.0f, delta);
 }
 
 
 void SunSystemScene::cameraMoveLeft()
 {
-    cameraPosition += QVector3D( -0.1f, 0.0f, 0.0f);
+    float delta = -0.1;
+    cameraPosition += QVector3D( delta, 0.0f, 0.0f);
+    cameraDirection += QVector3D( delta, 0.0f, 0.0f);
 }
 
 
 void SunSystemScene::cameraMoveRight()
 {
-    cameraPosition += QVector3D( 0.1f, 0.0f, 0.0f);
+    float delta = 0.1;
+    cameraPosition += QVector3D( delta, 0.0f, 0.0f);
+    cameraDirection += QVector3D( delta, 0.0f, 0.0f);
 }

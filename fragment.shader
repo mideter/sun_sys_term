@@ -34,7 +34,7 @@ out mediump vec4 glFragColor;
 
 void ads(out vec3 ambAndDiff, out vec3 specular)
 {
-    vec3 s = normalize( vec3(light.position));
+    vec3 s = normalize(light.position - position);
 
     vec3 viewDir = normalize( vec3(-position) );
     vec3 reflectLightDir = reflect(-s, normal);

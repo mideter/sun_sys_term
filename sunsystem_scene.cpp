@@ -45,9 +45,6 @@ void SunSystemScene::initialize()
 
     shaderProgram->bind();
 
-    shaderProgram->setUniformValue("light.position", QVector3D(0.1, 0.1, 0.1));
-    shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
-
     vertexBuffer.create();
     vertexBuffer.bind(); // bind() must be called before allocate()
     vertexBuffer.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
@@ -87,6 +84,9 @@ void SunSystemScene::paint()
     glEnable(GL_CULL_FACE); // Включаем отсечение граней.
     glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
 
+    shaderProgram->setUniformValue("light.position", viewMatrix * QVector3D(6, 6, 10) );
+    shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
+
     modelMatrix.setToIdentity();
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
@@ -94,14 +94,12 @@ void SunSystemScene::paint()
 }
 
 
-void SunSystemScene::paintObject(const QMatrix4x4 &mvMatrix)
+void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
 {
-    shaderProgram->bind();
-
     shaderProgram->setUniformValue("projectionMatrix", projectionMatrix);
-    shaderProgram->setUniformValue("modelViewMatrix", mvMatrix);
-    shaderProgram->setUniformValue("mvpMatrix", projectionMatrix * mvMatrix);
-    shaderProgram->setUniformValue("normalMatrix", mvMatrix.normalMatrix());
+    shaderProgram->setUniformValue("modelViewMatrix", modelViewMatrix);
+    shaderProgram->setUniformValue("mvpMatrix", projectionMatrix * modelViewMatrix);
+    shaderProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
 
     LightInteractingMaterial mainMaterial = earth3DModel->getMainMaterial();
     shaderProgram->setUniformValue("mat.ka", mainMaterial.getKa());

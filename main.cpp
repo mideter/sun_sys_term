@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     SunSystemScene sunSystemScene(&mainWindow);
     mainWindow.setScene(&sunSystemScene);
-    mainWindow.resize(600, 600);
+    mainWindow.resize(1200, 800);
     mainWindow.show();
 
     return a.exec();

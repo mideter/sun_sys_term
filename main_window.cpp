@@ -15,6 +15,11 @@ MainWindow::MainWindow(QWindow *parent)
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
     setFormat(surfaceFormat);
 
+    setMouseGrabEnabled(true);
+    QCursor blankCursor{ this->cursor() };
+    blankCursor.setShape(Qt::BlankCursor);
+    this->setCursor(blankCursor);
+
     windowUpdateAnimation.setStartValue(1);
     windowUpdateAnimation.setEndValue(this->fpsSetting);
     windowUpdateAnimation.setDuration(1000);
@@ -74,4 +79,32 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
         graphicScene->cameraMoveLeft();
     else if (keysToMoveRight.contains(ev->key()))
         graphicScene->cameraMoveRight();
+}
+
+
+void MainWindow::setCursorToWindowCenter()
+{
+    QCursor newPositionCursor{ this->cursor() };
+    QPoint windowPos = this->position();
+    QSize windowSize = this->size();
+    QPoint windowCenterPos = windowPos + QPoint(windowSize.width(), windowSize.height()) / 2.0f;
+    newPositionCursor.setPos(windowCenterPos);
+    setCursor(newPositionCursor);
+}
+
+
+void MainWindow::mouseMoveEvent(QMouseEvent *ev)
+{
+    static QPointF oldCursorPosition = {0, 0};
+    static const float moveMoveSensetive = 0.1;
+
+    QPointF moveVector = ev->globalPos() - oldCursorPosition;
+    moveVector = QPointF(moveVector.x(), -moveVector.y()); // Движение мыши вниз - отрицательное смещение по Y.
+
+    static QRectF rectForCursorMoving = {-20, -20, 40, 40};
+    if (rectForCursorMoving.contains(moveVector))
+        graphicScene->cameraRotateYAndZ(moveVector * moveMoveSensetive);
+
+    setCursorToWindowCenter();
+    oldCursorPosition = this->cursor().pos();
 }

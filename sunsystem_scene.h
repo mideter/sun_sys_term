@@ -30,6 +30,7 @@ public:
     virtual void cameraMoveBack();
     virtual void cameraMoveLeft();
     virtual void cameraMoveRight();
+    virtual void cameraRotateYAndZ(QPointF rotateByYAndZAxises);
 
 protected:
     void initializeObjectData();

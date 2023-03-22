@@ -142,5 +142,12 @@ void SunSystemScene::cameraMove(const QVector3D deltaToMove)
 {
     cameraPosition += deltaToMove;
     cameraDirection += deltaToMove;
+}
 
+
+void SunSystemScene::cameraRotateYAndZ(QPointF rotateByYAndZAxises)
+{
+    float a = rotateByYAndZAxises.x();
+    float b = rotateByYAndZAxises.y();
+    cameraDirection += QVector3D{a, b, 0};
 }

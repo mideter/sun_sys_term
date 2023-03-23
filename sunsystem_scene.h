@@ -30,7 +30,8 @@ public:
     virtual void cameraMoveBack();
     virtual void cameraMoveLeft();
     virtual void cameraMoveRight();
-    virtual void cameraRotateYAndZ(QPointF rotateByYAndZAxises);
+    virtual void cameraRotateByXYZAxises(float xRotate, float yRotate, float zRotate = 0);
+    virtual void cameraRotateByXYZAxises(const QVector3D &xyzRotate);
 
 protected:
     void initializeObjectData();
@@ -50,7 +51,7 @@ private:
     QPropertyAnimation rotationByEarthAxis;
 
     QVector3D cameraPosition;
-    QVector3D cameraDirection;
+    QVector3D cameraRatationAnglesXYZ;
 
     void cameraMove(const QVector3D deltaToMove);
 };

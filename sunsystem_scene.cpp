@@ -9,7 +9,7 @@ SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     , vertexBuffer(QOpenGLBuffer::VertexBuffer)
     , rotationByEarthAxis(this, "angleByEarthAxis")
     , cameraPosition( 3.0f, 3.0f, 13.0f)
-    , cameraDirection(0.0f, 0.0f, 0.0f)
+    , cameraRatationAnglesXYZ(0.0f, 0.0f, 0.0f)
 {
     vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     initializeObjectData();
@@ -73,8 +73,11 @@ void SunSystemScene::paint()
     projectionMatrix.perspective(45.0f, aspectRatio, 0.1, 10000.0f);
 
     viewMatrix.setToIdentity();
-    QVector3D up(0, 1.0f, 0);
-    viewMatrix.lookAt(cameraPosition, cameraDirection, up);
+    viewMatrix.rotate(cameraRatationAnglesXYZ[0], QVector3D{ 1, 0, 0});
+    viewMatrix.rotate(cameraRatationAnglesXYZ[1], QVector3D{ 0, 1, 0});
+   // viewMatrix.rotate(cameraRatationAnglesXYZ[2], QVector3D{ 0, 0, 1});
+    viewMatrix.translate(-cameraPosition); // Относительно камеры все объекты имеют инвертированное положение.
+    // Матричные преобразования идут в обратном вызовам функций порядке.
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window()->width(), window()->height());
@@ -83,7 +86,7 @@ void SunSystemScene::paint()
     glEnable(GL_CULL_FACE); // Включаем отсечение граней.
     glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
 
-    shaderProgram->setUniformValue("light.position", viewMatrix * QVector3D(16, 6, 6) );
+    shaderProgram->setUniformValue("light.position", viewMatrix * QVector4D(16, 6, 6, 1) );
     shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
 
     modelMatrix.setToIdentity();
@@ -141,13 +144,16 @@ void SunSystemScene::cameraMoveRight()
 void SunSystemScene::cameraMove(const QVector3D deltaToMove)
 {
     cameraPosition += deltaToMove;
-    cameraDirection += deltaToMove;
 }
 
 
-void SunSystemScene::cameraRotateYAndZ(QPointF rotateByYAndZAxises)
+void SunSystemScene::cameraRotateByXYZAxises(const QVector3D &xyzRotate)
 {
-    float a = rotateByYAndZAxises.x();
-    float b = rotateByYAndZAxises.y();
-    cameraDirection += QVector3D{a, b, 0};
+    cameraRatationAnglesXYZ += xyzRotate;
+}
+
+
+void SunSystemScene::cameraRotateByXYZAxises(float xRotate, float yRotate, float zRotate)
+{
+    cameraRotateByXYZAxises(QVector3D{ xRotate, yRotate, zRotate });
 }

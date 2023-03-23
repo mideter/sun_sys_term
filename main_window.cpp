@@ -98,12 +98,13 @@ void MainWindow::mouseMoveEvent(QMouseEvent *ev)
     static QPointF oldCursorPosition = {0, 0};
     static const float moveMoveSensetive = 0.1;
 
-    QPointF moveVector = ev->globalPos() - oldCursorPosition;
-    moveVector = QPointF(moveVector.x(), -moveVector.y()); // Движение мыши вниз - отрицательное смещение по Y.
+    QPointF tmpDifferent = ev->globalPos() - oldCursorPosition;
+    QVector2D mouseMovingVector{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует поворуту вокруг оси X, и наоборот.
+                                 static_cast<float>(tmpDifferent.x()) };
 
     static QRectF rectForCursorMoving = {-20, -20, 40, 40};
-    if (rectForCursorMoving.contains(moveVector))
-        graphicScene->cameraRotateYAndZ(moveVector * moveMoveSensetive);
+    if (rectForCursorMoving.contains(tmpDifferent))
+        graphicScene->cameraRotateByXYZAxises(mouseMovingVector * moveMoveSensetive);
 
     setCursorToWindowCenter();
     oldCursorPosition = this->cursor().pos();

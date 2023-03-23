@@ -102,11 +102,10 @@ QPoint MainWindow::windowCenterInGlobal() const
 void MainWindow::mouseMoveEvent(QMouseEvent *ev)
 {
     QPointF tmpDifferent = ev->globalPos() - this->windowCenterInGlobal();
-    QVector2D mouseMovingVector{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует поворуту вокруг оси X, и наоборот.
-                                 static_cast<float>(tmpDifferent.x()) };
+    QVector2D angleRotationsByXYAxises{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует поворуту вокруг оси X, и наоборот.
+                                        static_cast<float>(tmpDifferent.x()) };
 
-    graphicScene->cameraRotateByXYZAxises(mouseMovingVector * mouseSensetive);
-
+    graphicScene->cameraRotateByXYZAxises(angleRotationsByXYAxises * mouseSensetive);
     setCursorToWindowCenter();
 }
 

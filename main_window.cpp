@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWindow *parent)
     QCursor blankCursor{ this->cursor() };
     blankCursor.setShape(Qt::BlankCursor);
     this->setCursor(blankCursor);
+    setCursorToWindowCenter();
 
     windowUpdateAnimation.setStartValue(1);
     windowUpdateAnimation.setEndValue(this->fpsSetting);
@@ -102,9 +103,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *ev)
     QVector2D mouseMovingVector{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует поворуту вокруг оси X, и наоборот.
                                  static_cast<float>(tmpDifferent.x()) };
 
-    static QRectF rectForCursorMoving = {-20, -20, 40, 40};
-    if (rectForCursorMoving.contains(tmpDifferent))
-        graphicScene->cameraRotateByXYZAxises(mouseMovingVector * moveMoveSensetive);
+    graphicScene->cameraRotateByXYZAxises(mouseMovingVector * moveMoveSensetive);
 
     setCursorToWindowCenter();
     oldCursorPosition = this->cursor().pos();

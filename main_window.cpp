@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWindow *parent)
     : QOpenGLWindow(NoPartialUpdate, parent)
     , windowUpdateAnimation(this, "framesCount")
     , fpsSetting(60)
+    , mouseSensetive(0.1)
 {
     QSurfaceFormat surfaceFormat(this->format());
     // Добавляем к формату поверхности уточнение, что используется версия для OpenGL ES.
@@ -19,7 +20,6 @@ MainWindow::MainWindow(QWindow *parent)
     QCursor blankCursor{ this->cursor() };
     blankCursor.setShape(Qt::BlankCursor);
     this->setCursor(blankCursor);
-    setCursorToWindowCenter();
 
     windowUpdateAnimation.setStartValue(1);
     windowUpdateAnimation.setEndValue(this->fpsSetting);
@@ -86,25 +86,32 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
 void MainWindow::setCursorToWindowCenter()
 {
     QCursor newPositionCursor{ this->cursor() };
+    newPositionCursor.setPos( this->windowCenterInGlobal() );
+    setCursor(newPositionCursor);
+}
+
+
+QPoint MainWindow::windowCenterInGlobal() const
+{
     QPoint windowPos = this->position();
     QSize windowSize = this->size();
-    QPoint windowCenterPos = windowPos + QPoint(windowSize.width(), windowSize.height()) / 2.0f;
-    newPositionCursor.setPos(windowCenterPos);
-    setCursor(newPositionCursor);
+    return windowPos + QPoint(windowSize.width(), windowSize.height()) / 2.0f;
 }
 
 
 void MainWindow::mouseMoveEvent(QMouseEvent *ev)
 {
-    static QPointF oldCursorPosition = {0, 0};
-    static const float moveMoveSensetive = 0.1;
-
-    QPointF tmpDifferent = ev->globalPos() - oldCursorPosition;
+    QPointF tmpDifferent = ev->globalPos() - this->windowCenterInGlobal();
     QVector2D mouseMovingVector{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует поворуту вокруг оси X, и наоборот.
                                  static_cast<float>(tmpDifferent.x()) };
 
-    graphicScene->cameraRotateByXYZAxises(mouseMovingVector * moveMoveSensetive);
+    graphicScene->cameraRotateByXYZAxises(mouseMovingVector * mouseSensetive);
 
     setCursorToWindowCenter();
-    oldCursorPosition = this->cursor().pos();
+}
+
+
+void MainWindow::focusInEvent(QFocusEvent *)
+{
+    setCursorToWindowCenter();
 }

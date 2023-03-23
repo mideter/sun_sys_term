@@ -26,12 +26,12 @@ public:
     void initialize() override;
     void paint() override;
 
-    virtual void cameraMoveForward();
-    virtual void cameraMoveBack();
-    virtual void cameraMoveLeft();
-    virtual void cameraMoveRight();
-    virtual void cameraRotateByXYZAxises(float xRotate, float yRotate, float zRotate = 0);
-    virtual void cameraRotateByXYZAxises(const QVector3D &xyzRotate);
+    void cameraMoveForward();
+    void cameraMoveBack();
+    void cameraMoveLeft();
+    void cameraMoveRight();
+    void cameraRotateByXYZAxises(float xRotate, float yRotate, float zRotate = 0);
+    void cameraRotateByXYZAxises(const QVector3D &xyzRotate);
 
 protected:
     void initializeObjectData();

@@ -26,6 +26,7 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *ev) override;
     void mouseMoveEvent(QMouseEvent *ev) override;
+    void focusInEvent(QFocusEvent *ev) override;
 
 private:
     QPropertyAnimation windowUpdateAnimation;
@@ -34,8 +35,11 @@ private:
     const int fpsSetting;
     int framesCount;
 
+    float mouseSensetive;
+
     void setframesCount(int val);
     void setCursorToWindowCenter();
+    QPoint windowCenterInGlobal() const;
 };
 
 #endif // MAINWINDOW_H

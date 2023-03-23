@@ -51,7 +51,9 @@ private:
     QPropertyAnimation rotationByEarthAxis;
 
     QVector3D cameraPosition;
-    QVector3D cameraRatationAnglesXYZ;
+    QVector3D cameraRotationAnglesXYZInDegrees;
+
+    float worldStep;
 
     void cameraMove(const QVector3D deltaToMove);
 };

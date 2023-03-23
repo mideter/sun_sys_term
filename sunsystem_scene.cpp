@@ -2,14 +2,16 @@
 #include "objfile_reader.h"
 
 #include <QOpenGLWindow>
+#include <QtCore/QtMath>
 
 
 SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     : GraphicScene(window)
     , vertexBuffer(QOpenGLBuffer::VertexBuffer)
     , rotationByEarthAxis(this, "angleByEarthAxis")
-    , cameraPosition( 3.0f, 3.0f, 13.0f)
-    , cameraRatationAnglesXYZ(0.0f, 0.0f, 0.0f)
+    , cameraPosition( 0.0f, 0.0f, 25.0f)
+    , cameraRotationAnglesXYZInDegrees(0.0f, 0.0f, 0.0f)
+    , worldStep(0.1f)
 {
     vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     initializeObjectData();
@@ -73,8 +75,8 @@ void SunSystemScene::paint()
     projectionMatrix.perspective(45.0f, aspectRatio, 0.1, 10000.0f);
 
     viewMatrix.setToIdentity();
-    viewMatrix.rotate(cameraRatationAnglesXYZ[0], QVector3D{ 1, 0, 0});
-    viewMatrix.rotate(cameraRatationAnglesXYZ[1], QVector3D{ 0, 1, 0});
+    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[0], QVector3D{ 1, 0, 0});
+    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[1], QVector3D{ 0, 1, 0});
    // viewMatrix.rotate(cameraRatationAnglesXYZ[2], QVector3D{ 0, 0, 1});
     viewMatrix.translate(-cameraPosition); // Относительно камеры все объекты имеют инвертированное положение.
     // Матричные преобразования идут в обратном вызовам функций порядке.
@@ -115,29 +117,33 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
 
 void SunSystemScene::cameraMoveForward()
 {
-    float delta = -0.1;
-    cameraMove(QVector3D( 0.0f, 0.0f, delta));
+    float zMove = -worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
+    float xMove = worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
+    cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
 void SunSystemScene::cameraMoveBack()
 {
-    float delta = 0.1;
-    cameraMove(QVector3D( 0.0f, 0.0f, delta));
+    float zMove = worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
+    float xMove = -worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
+    cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
 void SunSystemScene::cameraMoveLeft()
 {
-    float delta = -0.1;
-    cameraMove(QVector3D( delta, 0.0f, 0.0f));
+    float zMove = worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
+    float xMove = -worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
+    cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
 void SunSystemScene::cameraMoveRight()
 {
-    float delta = 0.1;
-    cameraMove(QVector3D( delta, 0.0f, 0.0f));
+    float zMove = -worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
+    float xMove = worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
+    cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
@@ -149,7 +155,7 @@ void SunSystemScene::cameraMove(const QVector3D deltaToMove)
 
 void SunSystemScene::cameraRotateByXYZAxises(const QVector3D &xyzRotate)
 {
-    cameraRatationAnglesXYZ += xyzRotate;
+    cameraRotationAnglesXYZInDegrees += xyzRotate;
 }
 
 

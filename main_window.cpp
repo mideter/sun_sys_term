@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWindow *parent)
     // Добавляем к формату поверхности уточнение, что используется версия для OpenGL ES.
     // Чтобы в шейдеры не добалялись #define указателей точности, которые их скрывают.
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
+    surfaceFormat.setDepthBufferSize(24);
     setFormat(surfaceFormat);
 
     setMouseGrabEnabled(true);

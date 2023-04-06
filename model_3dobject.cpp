@@ -176,7 +176,7 @@ int Vertex::getPositionAttribOffset()
 }
 
 
-int Vertex::getTexturePositionAttribOffset()
+int Vertex::getTextureCoordsAttribOffset()
 {
     Vertex tmp;
     return reinterpret_cast<long>(&tmp.texturePosition) - reinterpret_cast<long>(&tmp);

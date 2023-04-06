@@ -20,6 +20,7 @@ struct Light {
 uniform Material mat;
 uniform Light light;
 
+uniform bool isSkybox;
 
 uniform lowp sampler2D textureSampler;
 
@@ -57,11 +58,17 @@ void ads(out vec3 ambAndDiff, out vec3 specular)
 
 
 void main(void) {
-    vec3 ambientAndDiffuse;
-    vec3 spec;
-    ads(ambientAndDiffuse, spec);
-
     vec4 textColor = texture2D( textureSampler, textureCoord );
 
-    glFragColor = vec4(ambientAndDiffuse, 1.0) * textColor + vec4(spec, 1.0);
+ /*   if (isSkybox)
+    {
+        glFragColor = textColor;
+    }
+    else
+    {*/
+        vec3 ambientAndDiffuse;
+        vec3 spec;
+        ads(ambientAndDiffuse, spec);
+        glFragColor = vec4(ambientAndDiffuse, 1.0) * textColor + vec4(spec, 1.0);
+  //  }
 }

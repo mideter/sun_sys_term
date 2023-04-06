@@ -3,6 +3,7 @@
 
 #include "graphic_scene.h"
 #include "model_3dobject.h"
+#include "skybox.h"
 
 #include <memory>
 #include <QVector3D>
@@ -42,10 +43,13 @@ private:
     QMatrix4x4 viewMatrix;
     QMatrix4x4 projectionMatrix;
 
+    std::unique_ptr<Skybox> skybox;
     std::unique_ptr<Model3DObject> earth3DModel;
 
-    QOpenGLBuffer vertexBuffer;
-    std::unique_ptr<QOpenGLTexture> texture = nullptr;
+    QOpenGLBuffer vertexBufferForPlanet;
+    QOpenGLBuffer vertexBufferForSkybox;
+    std::unique_ptr<QOpenGLTexture> texturePlanetEarth = nullptr;
+    std::unique_ptr<QOpenGLTexture> textureSkybox[6];
 
     float angleByEarthAxis;
     QPropertyAnimation rotationByEarthAxis;

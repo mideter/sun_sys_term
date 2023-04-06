@@ -10,6 +10,7 @@ SOURCES += \
     main_window.cpp \
     model_3dobject.cpp \
     objfile_reader.cpp \
+    skybox.cpp \
     sunsystem_scene.cpp
 
 HEADERS += \
@@ -17,6 +18,7 @@ HEADERS += \
     main_window.h \
     model_3dobject.h \
     objfile_reader.h \
+    skybox.h \
     sst_exeption.h \
     sunsystem_scene.h
 

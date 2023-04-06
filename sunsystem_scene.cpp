@@ -7,20 +7,22 @@
 
 SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     : GraphicScene(window)
-    , vertexBuffer(QOpenGLBuffer::VertexBuffer)
+    , vertexBufferForPlanet(QOpenGLBuffer::VertexBuffer)
+    , vertexBufferForSkybox(QOpenGLBuffer::VertexBuffer)
     , rotationByEarthAxis(this, "angleByEarthAxis")
     , cameraPosition( 0.0f, 0.0f, 25.0f)
     , cameraRotationAnglesXYZInDegrees(0.0f, 0.0f, 0.0f)
     , worldStep(0.1f)
 {
-    vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vertexBufferForPlanet.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vertexBufferForSkybox.setUsagePattern(QOpenGLBuffer::StaticDraw);
     initializeObjectData();
 
     rotationByEarthAxis.setStartValue(0);
     rotationByEarthAxis.setEndValue(359);
     rotationByEarthAxis.setDuration(180000);
     rotationByEarthAxis.setLoopCount(-1);
-    rotationByEarthAxis.start();
+ // rotationByEarthAxis.start();
 }
 
 
@@ -33,13 +35,17 @@ SunSystemScene::~SunSystemScene()
 
 void SunSystemScene::initializeObjectData()
 {
+    skybox.reset(new Skybox("data/skybox/"));
+
     ObjFileReader objFileReader;
     earth3DModel.reset(objFileReader.load("data/Earth/Earth.obj"));
 }
 
+
 void SunSystemScene::initialize()
 {
     GraphicScene::initialize();
+    glEnable(GL_DEPTH_TEST);
     glClearColor(0, 0, 0, 0);
 
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":vertex.shader");
@@ -48,23 +54,24 @@ void SunSystemScene::initialize()
 
     shaderProgram->bind();
 
-    vertexBuffer.create();
-    vertexBuffer.bind(); // bind() must be called before allocate()
-    vertexBuffer.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
+    vertexBufferForPlanet.create();
+    vertexBufferForPlanet.bind(); // bind() must be called before allocate()
+    vertexBufferForPlanet.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
 
-    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("vertexPosition");
+    vertexBufferForSkybox.create();
+    vertexBufferForSkybox.bind();
+    vertexBufferForSkybox.allocate(skybox->vertexData(), sizeof(Vertex) * skybox->getCountVertexes());
 
-    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("vertexNormal");
+    texturePlanetEarth.reset( new QOpenGLTexture{ earth3DModel->getMainTexture().mirrored() } );
+    texturePlanetEarth->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    texturePlanetEarth->setMagnificationFilter(QOpenGLTexture::Linear);
 
-    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTexturePositionAttribOffset(), 2, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("vertexTextureCoord");
-
-    texture.reset( new QOpenGLTexture{ earth3DModel->getMainTexture().mirrored() } );
-    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    texture->setMagnificationFilter(QOpenGLTexture::Linear);
-    texture->bind();
+    for (int i=0; i<6; i++)
+    {
+        textureSkybox[i].reset( new QOpenGLTexture{ skybox->getTextures()[i] } );
+        textureSkybox[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        textureSkybox[i]->setMagnificationFilter(QOpenGLTexture::Linear);
+    }
 }
 
 
@@ -83,17 +90,17 @@ void SunSystemScene::paint()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window()->width(), window()->height());
-    glEnable(GL_DEPTH_TEST);
 
-    glEnable(GL_CULL_FACE); // Включаем отсечение граней.
-    glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
+ // glEnable(GL_CULL_FACE); // Включаем отсечение граней.
+ // glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
 
-    shaderProgram->setUniformValue("light.position", viewMatrix * QVector4D(16, 6, 6, 1) );
+    shaderProgram->setUniformValue("light.position", QVector3D{ viewMatrix * QVector4D(6, 6, 16, 1)} );
     shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
 
     modelMatrix.setToIdentity();
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
+
     paintObject(modelViewMatrix);
 }
 
@@ -102,7 +109,7 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
 {
     shaderProgram->setUniformValue("projectionMatrix", projectionMatrix);
     shaderProgram->setUniformValue("modelViewMatrix", modelViewMatrix);
-    shaderProgram->setUniformValue("mvpMatrix", projectionMatrix * modelViewMatrix);
+    shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * modelViewMatrix);
     shaderProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
 
     LightInteractingMaterial mainMaterial = earth3DModel->getMainMaterial();
@@ -111,7 +118,29 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
     shaderProgram->setUniformValue("mat.ks", mainMaterial.getKs());
     shaderProgram->setUniformValue("mat.shininess", mainMaterial.getShininess());
 
+    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->enableAttributeArray("vertexPosition");
+
+    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->enableAttributeArray("vertexNormal");
+
+    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
+    shaderProgram->enableAttributeArray("vertexTextureCoord");
+
+    vertexBufferForPlanet.bind();
+    texturePlanetEarth->bind();
+    shaderProgram->setUniformValue("isSkybox", false);
+
     glDrawArrays(GL_TRIANGLES, 0, earth3DModel->getCountVertexes());
+
+ // vertexBufferForSkybox.bind();
+ // shaderProgram->setUniformValue("isSkybox", true);
+ // glDisable(GL_DEPTH_TEST);
+ // for(int i=0; i<6; i++)
+ // {
+ //     textureSkybox[i]->bind();
+ //     glDrawArrays(GL_QUADS, i * 4, 4);
+ // }
 }
 
 

@@ -42,11 +42,11 @@ private:
 
 public:
     Vertex() = default;
-    Vertex(const QVector3D &position, const QVector2D &texturePosition, const QVector3D &normal);
+    Vertex(const QVector3D &position, const QVector2D &texturePosition, const QVector3D &normal = QVector3D());
     ~Vertex() = default;
 
     static int getPositionAttribOffset();
-    static int getTexturePositionAttribOffset();
+    static int getTextureCoordsAttribOffset();
     static int getNormalAttribOffset();
 };
 

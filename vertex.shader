@@ -3,7 +3,9 @@
 uniform highp mat4 modelViewMatrix;
 uniform highp mat3 normalMatrix;
 uniform highp mat4 projectionMatrix;
-uniform highp mat4 mvpMatrix;
+uniform highp mat4 modelViewProjectionMatrix;
+
+uniform bool isSkybox;
 
 layout(location = 0) in highp vec3 vertexPosition;
 layout(location = 1) in mediump vec3 vertexNormal;
@@ -19,5 +21,5 @@ void main(void) {
     position = vec3(modelViewMatrix * vec4(vertexPosition, 1.0));
     textureCoord = vertexTextureCoord;
 
-    gl_Position = mvpMatrix * vec4(vertexPosition, 1.0);
+    gl_Position = modelViewProjectionMatrix * vec4(vertexPosition, 1.0);
 }

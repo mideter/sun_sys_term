@@ -22,7 +22,7 @@ SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     rotationByEarthAxis.setEndValue(359);
     rotationByEarthAxis.setDuration(180000);
     rotationByEarthAxis.setLoopCount(-1);
- // rotationByEarthAxis.start();
+    rotationByEarthAxis.start();
 }
 
 
@@ -46,7 +46,7 @@ void SunSystemScene::initialize()
 {
     GraphicScene::initialize();
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0, 0, 0, 0);
+    glClearColor(0.8, 0.9, 0.8, 1.0);
 
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":vertex.shader");
     shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":fragment.shader");
@@ -66,7 +66,7 @@ void SunSystemScene::initialize()
     texturePlanetEarth->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     texturePlanetEarth->setMagnificationFilter(QOpenGLTexture::Linear);
 
-    for (int i=0; i<6; i++)
+    for (int i = 0; i < 6; i++)
     {
         textureSkybox[i].reset( new QOpenGLTexture{ skybox->getTextures()[i] } );
         textureSkybox[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
@@ -82,8 +82,8 @@ void SunSystemScene::paint()
     projectionMatrix.perspective(45.0f, aspectRatio, 0.1, 10000.0f);
 
     viewMatrix.setToIdentity();
-    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[0], QVector3D{ 1, 0, 0});
-    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[1], QVector3D{ 0, 1, 0});
+    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[0], QVector3D{ 1, 0, 0 });
+    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[1], QVector3D{ 0, 1, 0 });
    // viewMatrix.rotate(cameraRatationAnglesXYZ[2], QVector3D{ 0, 0, 1});
     viewMatrix.translate(-cameraPosition); // Относительно камеры все объекты имеют инвертированное положение.
     // Матричные преобразования идут в обратном вызовам функций порядке.
@@ -118,29 +118,41 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
     shaderProgram->setUniformValue("mat.ks", mainMaterial.getKs());
     shaderProgram->setUniformValue("mat.shininess", mainMaterial.getShininess());
 
-    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("vertexPosition");
-
-    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("vertexNormal");
-
-    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
-    shaderProgram->enableAttributeArray("vertexTextureCoord");
-
     vertexBufferForPlanet.bind();
     texturePlanetEarth->bind();
-    shaderProgram->setUniformValue("isSkybox", false);
+    shaderProgram->setUniformValue("useTexture", true);
+    shaderProgram->setUniformValue("useNormal", true);
 
-    glDrawArrays(GL_TRIANGLES, 0, earth3DModel->getCountVertexes());
+    shaderProgram->enableAttributeArray("vertexPosition");
+    shaderProgram->enableAttributeArray("vertexNormal");
+    shaderProgram->enableAttributeArray("vertexTextureCoord");
 
- // vertexBufferForSkybox.bind();
- // shaderProgram->setUniformValue("isSkybox", true);
- // glDisable(GL_DEPTH_TEST);
- // for(int i=0; i<6; i++)
- // {
- //     textureSkybox[i]->bind();
- //     glDrawArrays(GL_QUADS, i * 4, 4);
- // }
+    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
+
+    glDrawArrays(GL_TRIANGLES, 0, earth3DModel->getCountVertexes() );
+
+    vertexBufferForPlanet.release();
+    texturePlanetEarth->release();
+
+    vertexBufferForSkybox.bind();
+    shaderProgram->enableAttributeArray("vertexPosition");
+    shaderProgram->enableAttributeArray("vertexNormal");
+    shaderProgram->enableAttributeArray("vertexTextureCoord");
+
+    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
+
+    shaderProgram->setUniformValue("useTexture", true);
+    shaderProgram->setUniformValue("useNormal", true); // ВОПРОС почему, когда false не работает
+    for(int i = 0; i < 6; i++)
+    {
+        textureSkybox[i]->bind();
+        glDrawArrays(GL_TRIANGLES, i * 6, 6);
+        textureSkybox[i]->release();
+    }
 }
 
 

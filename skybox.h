@@ -10,10 +10,8 @@
 class Skybox
 {
 private:
-    QVector<Vertex> vertexes;
-    QVector<float> textCoordinates;
-    QVector<float> positionCoordinates;
-
+    static const QVector<Vertex> vertexesForQuads;
+    static const QVector<Vertex> vertexes;
     QVector<QImage> textures;
 
 public:
@@ -21,7 +19,7 @@ public:
     ~Skybox() = default;
 
     int getCountVertexes() const;
-    const float* vertexData() const;
+    const Vertex* vertexData() const;
 
     const QVector<QImage> getTextures() const;
 };

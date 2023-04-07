@@ -12,8 +12,7 @@ int main(int argc, char *argv[])
 
     SunSystemScene sunSystemScene(&mainWindow);
     mainWindow.setScene(&sunSystemScene);
-    mainWindow.resize(1200, 800);
-    mainWindow.show();
+    mainWindow.showFullScreen();
 
     return a.exec();
 }

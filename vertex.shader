@@ -5,7 +5,8 @@ uniform highp mat3 normalMatrix;
 uniform highp mat4 projectionMatrix;
 uniform highp mat4 modelViewProjectionMatrix;
 
-uniform bool isSkybox;
+uniform bool useTexture;
+uniform bool useNormal;
 
 layout(location = 0) in highp vec3 vertexPosition;
 layout(location = 1) in mediump vec3 vertexNormal;
@@ -17,9 +18,18 @@ out mediump vec2 textureCoord;
 
 
 void main(void) {
-    normal = normalize(normalMatrix * vertexNormal);
-    position = vec3(modelViewMatrix * vec4(vertexPosition, 1.0));
-    textureCoord = vertexTextureCoord;
+    if (useNormal) {
+        normal = normalize(normalMatrix * vertexNormal);
+        position = vec3(modelViewMatrix * vec4(vertexPosition, 1.0));
+        gl_Position = modelViewProjectionMatrix * vec4(vertexPosition, 1.0);
+    }
+    else
+    {
+        position = vertexPosition;
+        gl_Position = vec4(vertexPosition, 1.0);
+    }
 
-    gl_Position = modelViewProjectionMatrix * vec4(vertexPosition, 1.0);
+    if (useTexture) {
+        textureCoord = vertexTextureCoord;
+    }
 }

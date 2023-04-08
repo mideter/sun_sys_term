@@ -157,7 +157,7 @@ void SunSystemScene::paintSkybox()
     shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
 
     shaderProgram->setUniformValue("useTexture", true);
-    shaderProgram->setUniformValue("useNormal", true); // ВОПРОС почему, когда false не работает
+    shaderProgram->setUniformValue("useNormal", false);
     for(int i = 0; i < 6; i++)
     {
         textureSkybox[i]->bind();

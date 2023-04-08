@@ -70,10 +70,10 @@ void main(void) {
         vec3 ambientAndDiffuse;
         vec3 spec;
         ads(ambientAndDiffuse, spec);
-        glFragColor = vec4(ambientAndDiffuse, 1.0) * textColor + vec4(spec, 1.0) + vec4(0.1, 0.1, 0.1, 0);
+        glFragColor = vec4(ambientAndDiffuse, 1.0) * textColor + vec4(spec, 1.0);
     }
     else
     {
-        glFragColor = textColor;
+        glFragColor = textColor * 1.2;
     }
 }

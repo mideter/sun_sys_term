@@ -25,8 +25,8 @@ void main(void) {
     }
     else
     {
-        position = vertexPosition;
-        gl_Position = vec4(vertexPosition, 1.0);
+        position = vec3(modelViewMatrix * vec4(vertexPosition, 1.0));
+        gl_Position = modelViewProjectionMatrix * vec4(vertexPosition, 1.0);
     }
 
     if (useTexture) {

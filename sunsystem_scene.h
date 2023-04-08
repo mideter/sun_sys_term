@@ -37,6 +37,7 @@ public:
 protected:
     void initializeObjectData();
     void paintObject(const QMatrix4x4 &mvMatrix);
+    void paintSkybox();
 
 private:
     QMatrix4x4 modelMatrix;

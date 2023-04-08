@@ -102,6 +102,7 @@ void SunSystemScene::paint()
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
 
     paintObject(modelViewMatrix);
+    paintSkybox();
 }
 
 
@@ -135,6 +136,15 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
 
     vertexBufferForPlanet.release();
     texturePlanetEarth->release();
+}
+
+
+void SunSystemScene::paintSkybox()
+{
+    QMatrix4x4 identityMatrix;
+    identityMatrix.setToIdentity();
+    shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * viewMatrix);
+    shaderProgram->setUniformValue("normalMatrix", identityMatrix);
 
     vertexBufferForSkybox.bind();
     shaderProgram->enableAttributeArray("vertexPosition");

@@ -81,10 +81,11 @@ void SunSystemScene::paint()
     float aspectRatio = qreal(window()->width()) / window()->height();
     projectionMatrix.perspective(45.0f, aspectRatio, 0.1, 10000.0f);
 
-    viewMatrix.setToIdentity();
-    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[0], QVector3D{ 1, 0, 0 });
-    viewMatrix.rotate(cameraRotationAnglesXYZInDegrees[1], QVector3D{ 0, 1, 0 });
+    viewMatrixWithoutTranslate.setToIdentity();
+    viewMatrixWithoutTranslate.rotate(cameraRotationAnglesXYZInDegrees[0], QVector3D{ 1, 0, 0 });
+    viewMatrixWithoutTranslate.rotate(cameraRotationAnglesXYZInDegrees[1], QVector3D{ 0, 1, 0 });
    // viewMatrix.rotate(cameraRatationAnglesXYZ[2], QVector3D{ 0, 0, 1});
+    viewMatrix = viewMatrixWithoutTranslate;
     viewMatrix.translate(-cameraPosition); // Относительно камеры все объекты имеют инвертированное положение.
     // Матричные преобразования идут в обратном вызовам функций порядке.
 
@@ -143,7 +144,7 @@ void SunSystemScene::paintSkybox()
 {
     QMatrix4x4 identityMatrix;
     identityMatrix.setToIdentity();
-    shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * viewMatrix);
+    shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * viewMatrixWithoutTranslate);
     shaderProgram->setUniformValue("normalMatrix", identityMatrix);
 
     vertexBufferForSkybox.bind();

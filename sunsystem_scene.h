@@ -42,6 +42,7 @@ protected:
 private:
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
+    QMatrix4x4 viewMatrixWithoutTranslate;
     QMatrix4x4 projectionMatrix;
 
     std::unique_ptr<Skybox> skybox;

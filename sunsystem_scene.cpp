@@ -68,7 +68,7 @@ void SunSystemScene::initialize()
 
     for (int i = 0; i < 6; i++)
     {
-        textureSkybox[i].reset( new QOpenGLTexture{ skybox->getTextures()[i] } );
+        textureSkybox[i].reset( new QOpenGLTexture{ skybox->getTextures()[i].mirrored() } );
         textureSkybox[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
         textureSkybox[i]->setMagnificationFilter(QOpenGLTexture::Linear);
     }
@@ -92,8 +92,8 @@ void SunSystemScene::paint()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window()->width(), window()->height());
 
- // glEnable(GL_CULL_FACE); // Включаем отсечение граней.
- // glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
+    glEnable(GL_CULL_FACE); // Включаем отсечение граней.
+    glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
 
     shaderProgram->setUniformValue("light.position", QVector3D{ viewMatrix * QVector4D(6, 6, 16, 1)} );
     shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));

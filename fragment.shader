@@ -74,6 +74,6 @@ void main(void) {
     }
     else
     {
-        glFragColor = textColor * 1.2;
+        glFragColor = textColor;
     }
 }

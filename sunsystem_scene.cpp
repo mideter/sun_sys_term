@@ -38,7 +38,8 @@ void SunSystemScene::initializeObjectData()
     skybox.reset(new Skybox("data/skybox/"));
 
     ObjFileReader objFileReader;
-    earth3DModel.reset(objFileReader.load("data/Earth/Earth.obj"));
+   // earth3DModel.reset(objFileReader.load("data/Earth/Earth.obj"));
+    moon3DModel.reset(objFileReader.load("data/Moon/Moon.obj"));
 }
 
 
@@ -56,15 +57,16 @@ void SunSystemScene::initialize()
 
     vertexBufferForPlanet.create();
     vertexBufferForPlanet.bind(); // bind() must be called before allocate()
-    vertexBufferForPlanet.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
+    // vertexBufferForPlanet.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
+    vertexBufferForPlanet.allocate(moon3DModel->vertexData(), sizeof(Vertex) * moon3DModel->getCountVertexes());
 
     vertexBufferForSkybox.create();
     vertexBufferForSkybox.bind();
     vertexBufferForSkybox.allocate(skybox->vertexData(), sizeof(Vertex) * skybox->getCountVertexes());
 
-    texturePlanetEarth.reset( new QOpenGLTexture{ earth3DModel->getMainTexture().mirrored() } );
-    texturePlanetEarth->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    texturePlanetEarth->setMagnificationFilter(QOpenGLTexture::Linear);
+    texturePlanet.reset( new QOpenGLTexture{ moon3DModel->getMainTexture().mirrored() } );
+    texturePlanet->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    texturePlanet->setMagnificationFilter(QOpenGLTexture::Linear);
 
     for (int i = 0; i < 6; i++)
     {
@@ -114,14 +116,14 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
     shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * modelViewMatrix);
     shaderProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
 
-    LightInteractingMaterial mainMaterial = earth3DModel->getMainMaterial();
+    LightInteractingMaterial mainMaterial = moon3DModel->getMainMaterial();
     shaderProgram->setUniformValue("mat.ka", mainMaterial.getKa());
     shaderProgram->setUniformValue("mat.kd", mainMaterial.getKd());
     shaderProgram->setUniformValue("mat.ks", mainMaterial.getKs());
     shaderProgram->setUniformValue("mat.shininess", mainMaterial.getShininess());
 
     vertexBufferForPlanet.bind();
-    texturePlanetEarth->bind();
+    texturePlanet->bind();
     shaderProgram->setUniformValue("useTexture", true);
     shaderProgram->setUniformValue("useNormal", true);
 
@@ -133,10 +135,7 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
     shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
     shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
 
-    glDrawArrays(GL_TRIANGLES, 0, earth3DModel->getCountVertexes() );
-
-    vertexBufferForPlanet.release();
-    texturePlanetEarth->release();
+    glDrawArrays(GL_TRIANGLES, 0, moon3DModel->getCountVertexes() );
 }
 
 
@@ -162,7 +161,6 @@ void SunSystemScene::paintSkybox()
     {
         textureSkybox[i]->bind();
         glDrawArrays(GL_TRIANGLES, i * 6, 6);
-        textureSkybox[i]->release();
     }
 }
 

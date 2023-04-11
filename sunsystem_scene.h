@@ -47,10 +47,11 @@ private:
 
     std::unique_ptr<Skybox> skybox;
     std::unique_ptr<Model3DObject> earth3DModel;
+    std::unique_ptr<Model3DObject> moon3DModel;
 
     QOpenGLBuffer vertexBufferForPlanet;
     QOpenGLBuffer vertexBufferForSkybox;
-    std::unique_ptr<QOpenGLTexture> texturePlanetEarth = nullptr;
+    std::unique_ptr<QOpenGLTexture> texturePlanet = nullptr;
     std::unique_ptr<QOpenGLTexture> textureSkybox[6];
 
     float angleByEarthAxis;

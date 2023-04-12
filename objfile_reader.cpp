@@ -217,6 +217,11 @@ void ObjFileReader::someProcessWithMaterial(const MaterialObjFile &material, Mod
     SurfaceWithOneMaterial surfaceWithOneMaterial( LightInteractingMaterial{ am, di, sp, em, material.ns },
                                                    getFacesForMaterial(matIndex),
                                                    texturePixmaps[0] );
+
+    vertexPositions.clear();
+    vertexTexturePositions.clear();
+    vertexNormals.clear();
+
     M->addSurface(surfaceWithOneMaterial);
 }
 
@@ -271,6 +276,11 @@ Model3DObject* ObjFileReader::createModel3DObject()
     {
         someProcessWithMaterial(materials[i], M, i);
     }
+
+    faces.clear();
+    materials.clear();
+    texturePixmaps.clear();
+    textureNames.clear();
 
     return M;
 }

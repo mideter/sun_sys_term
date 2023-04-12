@@ -38,7 +38,7 @@ void SunSystemScene::initializeObjectData()
     skybox.reset(new Skybox("data/skybox/"));
 
     ObjFileReader objFileReader;
-   // earth3DModel.reset(objFileReader.load("data/Earth/Earth.obj"));
+    earth3DModel.reset(objFileReader.load("data/Earth/Earth.obj"));
     moon3DModel.reset(objFileReader.load("data/Moon/Moon.obj"));
 }
 

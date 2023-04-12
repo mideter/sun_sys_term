@@ -7,14 +7,14 @@
 
 SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     : GraphicScene(window)
-    , vertexBufferForPlanet(QOpenGLBuffer::VertexBuffer)
+    , vertexBufferForMoonPlanet(QOpenGLBuffer::VertexBuffer)
     , vertexBufferForSkybox(QOpenGLBuffer::VertexBuffer)
     , rotationByEarthAxis(this, "angleByEarthAxis")
     , cameraPosition( 0.0f, 0.0f, 25.0f)
     , cameraRotationAnglesXYZInDegrees(0.0f, 0.0f, 0.0f)
     , worldStep(0.1f)
 {
-    vertexBufferForPlanet.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vertexBufferForMoonPlanet.setUsagePattern(QOpenGLBuffer::StaticDraw);
     vertexBufferForSkybox.setUsagePattern(QOpenGLBuffer::StaticDraw);
     initializeObjectData();
 
@@ -55,18 +55,25 @@ void SunSystemScene::initialize()
 
     shaderProgram->bind();
 
-    vertexBufferForPlanet.create();
-    vertexBufferForPlanet.bind(); // bind() must be called before allocate()
-    // vertexBufferForPlanet.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
-    vertexBufferForPlanet.allocate(moon3DModel->vertexData(), sizeof(Vertex) * moon3DModel->getCountVertexes());
+    vertexBufferForEarthPlanet.create();
+    vertexBufferForEarthPlanet.bind();
+    vertexBufferForEarthPlanet.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
+
+    vertexBufferForMoonPlanet.create();
+    vertexBufferForMoonPlanet.bind(); // bind() must be called before allocate()
+    vertexBufferForMoonPlanet.allocate(moon3DModel->vertexData(), sizeof(Vertex) * moon3DModel->getCountVertexes());
 
     vertexBufferForSkybox.create();
     vertexBufferForSkybox.bind();
     vertexBufferForSkybox.allocate(skybox->vertexData(), sizeof(Vertex) * skybox->getCountVertexes());
 
-    texturePlanet.reset( new QOpenGLTexture{ moon3DModel->getMainTexture().mirrored() } );
-    texturePlanet->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    texturePlanet->setMagnificationFilter(QOpenGLTexture::Linear);
+    textureEarthPlanet.reset( new QOpenGLTexture{ earth3DModel->getMainTexture().mirrored() });
+    textureEarthPlanet->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    textureEarthPlanet->setMagnificationFilter(QOpenGLTexture::Linear);
+
+    textureMoonPlanet.reset( new QOpenGLTexture{ moon3DModel->getMainTexture().mirrored() } );
+    textureMoonPlanet->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    textureMoonPlanet->setMagnificationFilter(QOpenGLTexture::Linear);
 
     for (int i = 0; i < 6; i++)
     {
@@ -100,16 +107,25 @@ void SunSystemScene::paint()
     shaderProgram->setUniformValue("light.position", QVector3D{ viewMatrix * QVector4D(6, 6, 16, 1)} );
     shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
 
+    QMatrix4x4 modelMatrix;
     modelMatrix.setToIdentity();
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
 
-    paintObject(modelViewMatrix);
+    paintObject(vertexBufferForEarthPlanet, textureEarthPlanet.get(), modelViewMatrix);
+
+    modelMatrix.setToIdentity();
+    modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
+    modelMatrix.translate(QVector3D(20.0f, 0.0f, 0.0f));
+    modelViewMatrix = viewMatrix * modelMatrix;
+    paintObject(vertexBufferForMoonPlanet, textureMoonPlanet.get(), modelViewMatrix);
+
     paintSkybox();
 }
 
 
-void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
+void SunSystemScene::paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *texture,
+                                 const QMatrix4x4 &modelViewMatrix)
 {
     shaderProgram->setUniformValue("projectionMatrix", projectionMatrix);
     shaderProgram->setUniformValue("modelViewMatrix", modelViewMatrix);
@@ -122,8 +138,8 @@ void SunSystemScene::paintObject(const QMatrix4x4 &modelViewMatrix)
     shaderProgram->setUniformValue("mat.ks", mainMaterial.getKs());
     shaderProgram->setUniformValue("mat.shininess", mainMaterial.getShininess());
 
-    vertexBufferForPlanet.bind();
-    texturePlanet->bind();
+    vertexBuffer.bind();
+    texture->bind();
     shaderProgram->setUniformValue("useTexture", true);
     shaderProgram->setUniformValue("useNormal", true);
 

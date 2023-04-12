@@ -36,11 +36,10 @@ public:
 
 protected:
     void initializeObjectData();
-    void paintObject(const QMatrix4x4 &mvMatrix);
+    void paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *texture, const QMatrix4x4 &mvMatrix);
     void paintSkybox();
 
 private:
-    QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
     QMatrix4x4 viewMatrixWithoutTranslate;
     QMatrix4x4 projectionMatrix;
@@ -49,9 +48,11 @@ private:
     std::unique_ptr<Model3DObject> earth3DModel;
     std::unique_ptr<Model3DObject> moon3DModel;
 
-    QOpenGLBuffer vertexBufferForPlanet;
+    QOpenGLBuffer vertexBufferForEarthPlanet;
+    QOpenGLBuffer vertexBufferForMoonPlanet;
     QOpenGLBuffer vertexBufferForSkybox;
-    std::unique_ptr<QOpenGLTexture> texturePlanet = nullptr;
+    std::unique_ptr<QOpenGLTexture> textureEarthPlanet = nullptr;
+    std::unique_ptr<QOpenGLTexture> textureMoonPlanet = nullptr;
     std::unique_ptr<QOpenGLTexture> textureSkybox[6];
 
     float angleByEarthAxis;

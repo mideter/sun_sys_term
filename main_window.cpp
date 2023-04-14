@@ -2,11 +2,13 @@
 #include "sunsystem_scene.h"
 
 #include <QKeyEvent>
+#include <QOpenGLDebugLogger>
 
 
 MainWindow::MainWindow(QWindow *parent)
     : QOpenGLWindow(NoPartialUpdate, parent)
     , windowUpdateAnimation(this, "framesCount")
+    , openGlDebugLogger{ new QOpenGLDebugLogger(this) }
     , fpsSetting(60)
     , mouseSensetive(0.1)
 {
@@ -15,6 +17,7 @@ MainWindow::MainWindow(QWindow *parent)
     // Чтобы в шейдеры не добалялись #define указателей точности, которые их скрывают.
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
     surfaceFormat.setDepthBufferSize(24);
+    surfaceFormat.setOption(QSurfaceFormat::DebugContext);
     setFormat(surfaceFormat);
 
     setMouseGrabEnabled(true);
@@ -32,8 +35,20 @@ MainWindow::MainWindow(QWindow *parent)
 
 void MainWindow::initializeGL()
 {
+    this->makeCurrent(); // make current this window OpenGL context.
+    bool doesOpenGLDebugLoggerInitialize = openGlDebugLogger->initialize(); // in current OpenGL context.
+    qDebug() << "OpenGL debug logger was initialized: " << doesOpenGLDebugLoggerInitialize;
+
     if(graphicScene)
         graphicScene->initialize();
+    connect(openGlDebugLogger, &QOpenGLDebugLogger::messageLogged, this, &MainWindow::handleLoggedMessage);
+    openGlDebugLogger->startLogging();
+}
+
+
+void MainWindow::handleLoggedMessage(const QOpenGLDebugMessage &message)
+{
+    qDebug() << "OpenGL debug message: " <<  message.message();
 }
 
 
@@ -41,6 +56,10 @@ void MainWindow::paintGL()
 {
     if(graphicScene)
         graphicScene->paint();
+
+    const QList<QOpenGLDebugMessage> messages = openGlDebugLogger->loggedMessages();
+    for (QOpenGLDebugMessage message : messages)
+        qDebug() << message;
 }
 
 

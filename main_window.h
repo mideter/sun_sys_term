@@ -3,9 +3,10 @@
 
 #include <QOpenGLWindow>
 #include <QPropertyAnimation>
-
+#include <QOpenGLDebugMessage>
 
 class SunSystemScene;
+class QOpenGLDebugLogger;
 
 class MainWindow : public QOpenGLWindow
 {
@@ -31,6 +32,7 @@ protected:
 private:
     QPropertyAnimation windowUpdateAnimation;
     SunSystemScene *graphicScene = nullptr;
+    QOpenGLDebugLogger *openGlDebugLogger = nullptr;
 
     const int fpsSetting;
     int framesCount;
@@ -40,6 +42,9 @@ private:
     void setframesCount(int val);
     void setCursorToWindowCenter();
     QPoint windowCenterInGlobal() const;
+
+private slots:
+    void handleLoggedMessage(const QOpenGLDebugMessage &message);
 };
 
 #endif // MAINWINDOW_H

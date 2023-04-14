@@ -115,7 +115,6 @@ void SunSystemScene::paint()
     //  } while (error != GL_NO_ERROR);
 
     QMatrix4x4 modelMatrix;
-    modelMatrix.setToIdentity();
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
 
@@ -164,10 +163,7 @@ void SunSystemScene::paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *te
 
 void SunSystemScene::paintSkybox()
 {
-    QMatrix4x4 identityMatrix;
-    identityMatrix.setToIdentity();
     shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * viewMatrixWithoutTranslate);
-    shaderProgram->setUniformValue("normalMatrix", identityMatrix);
 
     vertexBufferForSkybox.bind();
     shaderProgram->enableAttributeArray("vertexPosition");

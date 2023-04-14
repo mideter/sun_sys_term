@@ -31,6 +31,8 @@ public:
     void cameraMoveBack();
     void cameraMoveLeft();
     void cameraMoveRight();
+    void cameraMoveUp();
+    void cameraMoveDown();
     void cameraRotateByXYZAxises(float xRotate, float yRotate, float zRotate = 0);
     void cameraRotateByXYZAxises(const QVector3D &xyzRotate);
 

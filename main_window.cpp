@@ -91,6 +91,8 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
     QVector<int> keysToMoveBack{ Qt::Key_S, Qt::Key_Down };
     QVector<int> keysToMoveLeft{ Qt::Key_A, Qt::Key_Left };
     QVector<int> keysToMoveRight{ Qt::Key_D, Qt::Key_Right };
+    QVector<int> keysToMoveUp{ Qt::Key_Space };
+    QVector<int> keysToMoveDown{ Qt::Key_Control };
 
     if( keysToMoveForward.contains(ev->key()))
         graphicScene->cameraMoveForward();
@@ -100,6 +102,10 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
         graphicScene->cameraMoveLeft();
     else if (keysToMoveRight.contains(ev->key()))
         graphicScene->cameraMoveRight();
+    else if (keysToMoveUp.contains(ev->key()))
+        graphicScene->cameraMoveUp();
+    else if (keysToMoveDown.contains(ev->key()))
+        graphicScene->cameraMoveDown();
 }
 
 

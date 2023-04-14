@@ -12,7 +12,7 @@ SunSystemScene::SunSystemScene(QOpenGLWindow *window)
     , rotationByEarthAxis(this, "angleByEarthAxis")
     , cameraPosition( 0.0f, 0.0f, 25.0f)
     , cameraRotationAnglesXYZInDegrees(0.0f, 0.0f, 0.0f)
-    , worldStep(0.1f)
+    , worldStep(0.5f)
 {
     vertexBufferForMoonPlanet.setUsagePattern(QOpenGLBuffer::StaticDraw);
     vertexBufferForSkybox.setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -214,6 +214,20 @@ void SunSystemScene::cameraMoveRight()
     float zMove = -worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
     float xMove = worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
     cameraMove(QVector3D( xMove, 0.0f, zMove));
+}
+
+
+void SunSystemScene::cameraMoveUp()
+{
+    float yMove = worldStep;
+    cameraMove(QVector3D(0.0f, yMove, 0.0f));
+}
+
+
+void SunSystemScene::cameraMoveDown()
+{
+    float yMove = -worldStep;
+    cameraMove(QVector3D(0.0f, yMove, 0.0f));
 }
 
 

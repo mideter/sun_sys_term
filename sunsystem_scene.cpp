@@ -107,18 +107,17 @@ void SunSystemScene::paint()
     shaderProgram->setUniformValue("light.position", QVector3D{ viewMatrix * QVector4D(6, 6, 16, 1)} );
     shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
 
-    //  GLenum error = GL_NO_ERROR;
-    //  do {
-    //  error = glGetError();
-    //  if (error != GL_NO_ERROR)
-    //          qDebug() << "error occured number " << error;
-    //  } while (error != GL_NO_ERROR);
-
     QMatrix4x4 modelMatrix;
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
 
     paintObject(vertexBufferForEarthPlanet, textureEarthPlanet.get(), modelViewMatrix);
+    GLenum error = GL_NO_ERROR;
+    do {
+    error = glGetError();
+    if (error != GL_NO_ERROR)
+            qDebug() << "error occured number " << error;
+    } while (error != GL_NO_ERROR);
 
     modelMatrix.setToIdentity();
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});

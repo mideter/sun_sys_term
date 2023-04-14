@@ -38,11 +38,11 @@ void MainWindow::initializeGL()
     this->makeCurrent(); // make current this window OpenGL context.
     bool doesOpenGLDebugLoggerInitialize = openGlDebugLogger->initialize(); // in current OpenGL context.
     qDebug() << "OpenGL debug logger was initialized: " << doesOpenGLDebugLoggerInitialize;
+    connect(openGlDebugLogger, &QOpenGLDebugLogger::messageLogged, this, &MainWindow::handleLoggedMessage);
+    openGlDebugLogger->startLogging();
 
     if(graphicScene)
         graphicScene->initialize();
-    connect(openGlDebugLogger, &QOpenGLDebugLogger::messageLogged, this, &MainWindow::handleLoggedMessage);
-    openGlDebugLogger->startLogging();
 }
 
 
@@ -56,10 +56,6 @@ void MainWindow::paintGL()
 {
     if(graphicScene)
         graphicScene->paint();
-
-    const QList<QOpenGLDebugMessage> messages = openGlDebugLogger->loggedMessages();
-    for (QOpenGLDebugMessage message : messages)
-        qDebug() << message;
 }
 
 

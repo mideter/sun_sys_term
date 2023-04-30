@@ -21,7 +21,7 @@ class SunSystemScene : public GraphicScene
     Q_PROPERTY(float angleByEarthAxis MEMBER angleByEarthAxis)
 
 public:
-    explicit SunSystemScene(QOpenGLWindow *window);
+    explicit SunSystemScene();
     ~SunSystemScene();
 
     void initialize() override;

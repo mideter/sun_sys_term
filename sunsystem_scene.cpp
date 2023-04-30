@@ -1,12 +1,12 @@
 #include "sunsystem_scene.h"
 #include "objfile_reader.h"
 
-#include <QOpenGLWindow>
+#include <sst_window.h>
 #include <QtCore/QtMath>
 
 
-SunSystemScene::SunSystemScene(QOpenGLWindow *window)
-    : GraphicScene(window)
+SunSystemScene::SunSystemScene()
+    : GraphicScene()
     , vertexBufferForMoonPlanet(QOpenGLBuffer::VertexBuffer)
     , vertexBufferForSkybox(QOpenGLBuffer::VertexBuffer)
     , rotationByEarthAxis(this, "angleByEarthAxis")

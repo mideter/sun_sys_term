@@ -1,17 +1,13 @@
 #include "graphic_scene.h"
 
-#include <QOpenGLWindow>
-
-
-GraphicScene::GraphicScene(QOpenGLWindow *window)
-    : openGlWindow(window)
-{}
+#include <sst_window.h>
 
 
 GraphicScene::~GraphicScene()
 {
     // Makes current window context to correct deleting OpenGL resources.
-    window()->makeCurrent();
+    if (window() != nullptr)
+        window()->makeCurrent();
 }
 
 
@@ -22,25 +18,31 @@ void GraphicScene::initialize()
 }
 
 
+void GraphicScene::setWindow(sst::Window *window)
+{
+    sceneWindow = window;
+}
+
+
 QOpenGLShaderProgram& GraphicScene::getShaderProgram()
 {
     return *shaderProgram;
 }
 
 
-QOpenGLWindow* GraphicScene::window() const
+sst::Window* GraphicScene::window() const
 {
-    return openGlWindow;
+    return sceneWindow;
 }
 
 
 QOpenGLContext* GraphicScene::context()
 {
-    return openGlWindow ? openGlWindow->context() : nullptr;
+    return sceneWindow ? sceneWindow->context() : nullptr;
 }
 
 
 const QOpenGLContext* GraphicScene::context() const
 {
-    return openGlWindow ? openGlWindow->context() : nullptr;
+    return sceneWindow ? sceneWindow->context() : nullptr;
 }

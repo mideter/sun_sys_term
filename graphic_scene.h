@@ -6,7 +6,11 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 
-class QOpenGLWindow;
+
+namespace sst {
+class Window;
+}
+
 
 class GraphicScene : public QObject
                    , public QOpenGLFunctions
@@ -14,10 +18,11 @@ class GraphicScene : public QObject
     Q_OBJECT
 
 public:
-    explicit GraphicScene(QOpenGLWindow * window = nullptr);
+    GraphicScene() = default;
     virtual ~GraphicScene() = 0;
 
-    QOpenGLWindow* window() const;
+    void setWindow(sst::Window *window);
+    sst::Window* window() const;
     QOpenGLContext* context();
     const QOpenGLContext* context() const;
     QOpenGLShaderProgram& getShaderProgram();
@@ -29,7 +34,7 @@ protected:
     std::unique_ptr<QOpenGLShaderProgram> shaderProgram = nullptr;
 
 private:
-    QOpenGLWindow *openGlWindow = nullptr;
+    sst::Window *sceneWindow = nullptr;
 };
 
 #endif // GRAPHICSCENE_H

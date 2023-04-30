@@ -1,15 +1,29 @@
-#include "main_window.h"
+#include "sst_window.h"
 #include "sunsystem_scene.h"
 
 #include <QKeyEvent>
 #include <QOpenGLDebugLogger>
 
 
+namespace sst {
+
+
 MainWindow::MainWindow(QWindow *parent)
-    : QOpenGLWindow(NoPartialUpdate, parent)
+    : Window(parent)
     , windowUpdateAnimation(this, "framesCount")
-    , openGlDebugLogger{ new QOpenGLDebugLogger(this) }
+{
+    windowUpdateAnimation.setStartValue(1);
+    windowUpdateAnimation.setEndValue(this->fpsSetting);
+    windowUpdateAnimation.setDuration(1000);
+    windowUpdateAnimation.setLoopCount(-1);
+    windowUpdateAnimation.start();
+}
+
+
+Window::Window(QWindow *parent)
+    : QOpenGLWindow(NoPartialUpdate, parent)
     , fpsSetting(60)
+    , openGlDebugLogger{ new QOpenGLDebugLogger(this) }
     , mouseSensetive(0.1)
 {
     QSurfaceFormat surfaceFormat(this->format());
@@ -24,16 +38,10 @@ MainWindow::MainWindow(QWindow *parent)
     QCursor blankCursor{ this->cursor() };
     blankCursor.setShape(Qt::BlankCursor);
     this->setCursor(blankCursor);
-
-    windowUpdateAnimation.setStartValue(1);
-    windowUpdateAnimation.setEndValue(this->fpsSetting);
-    windowUpdateAnimation.setDuration(1000);
-    windowUpdateAnimation.setLoopCount(-1);
-    windowUpdateAnimation.start();
 }
 
 
-void MainWindow::initializeGL()
+void Window::initializeGL()
 {
     this->makeCurrent(); // make current this window OpenGL context.
     bool doesOpenGLDebugLoggerInitialize = openGlDebugLogger->initialize(); // in current OpenGL context.
@@ -46,20 +54,20 @@ void MainWindow::initializeGL()
 }
 
 
-void MainWindow::handleLoggedMessage(const QOpenGLDebugMessage &message)
+void Window::handleLoggedMessage(const QOpenGLDebugMessage &message)
 {
     qDebug() << "OpenGL debug message: " <<  message.message();
 }
 
 
-void MainWindow::paintGL()
+void Window::paintGL()
 {
     if(graphicScene)
         graphicScene->paint();
 }
 
 
-void MainWindow::setframesCount(int val)
+void Window::setframesCount(int val)
 {
     if (val > 0)
     {
@@ -69,19 +77,23 @@ void MainWindow::setframesCount(int val)
 }
 
 
-SunSystemScene* MainWindow::scene()
+SunSystemScene* Window::scene()
 {
     return graphicScene;
 }
 
 
-void MainWindow::setScene(SunSystemScene *scene)
+void Window::setScene(SunSystemScene *scene)
 {
+    if (!scene)
+        return;
+
+    scene->setWindow(this);
     graphicScene = scene;
 }
 
 
-void MainWindow::keyPressEvent(QKeyEvent *ev)
+void Window::keyPressEvent(QKeyEvent *ev)
 {
     QVector<int> keysToMoveForward{ Qt::Key_W, Qt::Key_Up };
     QVector<int> keysToMoveBack{ Qt::Key_S, Qt::Key_Down };
@@ -105,7 +117,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
 }
 
 
-void MainWindow::setCursorToWindowCenter()
+void Window::setCursorToWindowCenter()
 {
     QCursor newPositionCursor{ this->cursor() };
     newPositionCursor.setPos( this->windowCenterInGlobal() );
@@ -113,7 +125,7 @@ void MainWindow::setCursorToWindowCenter()
 }
 
 
-QPoint MainWindow::windowCenterInGlobal() const
+QPoint Window::windowCenterInGlobal() const
 {
     QPoint windowPos = this->position();
     QSize windowSize = this->size();
@@ -121,7 +133,7 @@ QPoint MainWindow::windowCenterInGlobal() const
 }
 
 
-void MainWindow::mouseMoveEvent(QMouseEvent *ev)
+void Window::mouseMoveEvent(QMouseEvent *ev)
 {
     QPointF tmpDifferent = ev->globalPos() - this->windowCenterInGlobal();
     QVector2D angleRotationsByXYAxises{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует поворуту вокруг оси X, и наоборот.
@@ -132,7 +144,8 @@ void MainWindow::mouseMoveEvent(QMouseEvent *ev)
 }
 
 
-void MainWindow::focusInEvent(QFocusEvent *)
+void Window::focusInEvent(QFocusEvent *)
 {
     setCursorToWindowCenter();
 }
+} // namespace sst

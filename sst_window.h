@@ -8,7 +8,48 @@
 class SunSystemScene;
 class QOpenGLDebugLogger;
 
-class MainWindow : public QOpenGLWindow
+
+namespace sst {
+
+class Window : public QOpenGLWindow
+{
+    Q_OBJECT
+
+public:
+    explicit Window(QWindow *parent = nullptr);
+    ~Window() = default;
+
+    void initializeGL() override;
+    void paintGL() override;
+
+    SunSystemScene* scene();
+    void setScene(SunSystemScene *scene);
+
+protected:
+    const int fpsSetting;
+    int framesCount;
+
+    void setframesCount(int val);
+
+    void keyPressEvent(QKeyEvent *ev) override;
+    void mouseMoveEvent(QMouseEvent *ev) override;
+    void focusInEvent(QFocusEvent *ev) override;
+
+private:
+    SunSystemScene *graphicScene = nullptr;
+    QOpenGLDebugLogger *openGlDebugLogger = nullptr;
+
+    float mouseSensetive;
+
+    void setCursorToWindowCenter();
+    QPoint windowCenterInGlobal() const;
+
+private slots:
+    void handleLoggedMessage(const QOpenGLDebugMessage &message);
+};
+
+
+class MainWindow : public Window
 {
     Q_OBJECT
 
@@ -18,33 +59,10 @@ public:
     explicit MainWindow(QWindow *parent = nullptr);
     ~MainWindow() = default;
 
-    void initializeGL() override;
-    void paintGL() override;
-
-    SunSystemScene* scene();
-    void setScene(SunSystemScene *scene);
-
-protected:
-    void keyPressEvent(QKeyEvent *ev) override;
-    void mouseMoveEvent(QMouseEvent *ev) override;
-    void focusInEvent(QFocusEvent *ev) override;
-
 private:
     QPropertyAnimation windowUpdateAnimation;
-    SunSystemScene *graphicScene = nullptr;
-    QOpenGLDebugLogger *openGlDebugLogger = nullptr;
-
-    const int fpsSetting;
-    int framesCount;
-
-    float mouseSensetive;
-
-    void setframesCount(int val);
-    void setCursorToWindowCenter();
-    QPoint windowCenterInGlobal() const;
-
-private slots:
-    void handleLoggedMessage(const QOpenGLDebugMessage &message);
 };
+
+} // namespace sst
 
 #endif // MAINWINDOW_H

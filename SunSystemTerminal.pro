@@ -7,19 +7,19 @@ CONFIG += c++11
 SOURCES += \
     graphic_scene.cpp \
     main.cpp \
-    main_window.cpp \
     model_3dobject.cpp \
     objfile_reader.cpp \
     skybox.cpp \
+    sst_window.cpp \
     sunsystem_scene.cpp
 
 HEADERS += \
     graphic_scene.h \
-    main_window.h \
     model_3dobject.h \
     objfile_reader.h \
     skybox.h \
     sst_exeption.h \
+    sst_window.h \
     sunsystem_scene.h
 
 TRANSLATIONS += \

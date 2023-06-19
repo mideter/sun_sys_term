@@ -2,5 +2,17 @@
     <qresource prefix="/">
         <file>fragment.shader</file>
         <file>vertex.shader</file>
+        <file>data/Earth/Earth.obj</file>
+        <file>data/Earth/Earth.mtl</file>
+        <file>data/Earth/Earth.png</file>
+        <file>data/Moon/Moon.obj</file>
+        <file>data/Moon/Moon.mtl</file>
+        <file>data/Moon/Moon.png</file>
+        <file>data/skybox/back.png</file>
+        <file>data/skybox/down.png</file>
+        <file>data/skybox/front.png</file>
+        <file>data/skybox/left.png</file>
+        <file>data/skybox/right.png</file>
+        <file>data/skybox/up.png</file>
     </qresource>
 </RCC>

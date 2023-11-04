@@ -12,7 +12,11 @@ int main(int argc, char *argv[])
 
     SunSystemScene sunSystemScene;
     mainWindow.setScene(&sunSystemScene);
-    mainWindow.showFullScreen();
+    mainWindow.setMinimumSize(QSize(600,400));
+    mainWindow.setMaximumSize(QSize(600,400));
+    mainWindow.setBaseSize(QSize(600, 400));
+    mainWindow.show();
+    //mainWindow.showFullScreen();
 
     return a.exec();
 }

@@ -11,8 +11,8 @@ class QOpenGLDebugLogger;
 
 namespace sst {
 
-class Window : public QOpenGLWindow
-{
+
+class Window : public QOpenGLWindow{
     Q_OBJECT
 
 public:

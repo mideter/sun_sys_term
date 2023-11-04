@@ -1,6 +1,5 @@
 #include "graphic_scene.h"
-
-#include <sst_window.h>
+#include "sst_window.h"
 
 
 GraphicScene::~GraphicScene()

@@ -1,11 +1,10 @@
-#ifndef SUNSYSTEMSCENE_H
-#define SUNSYSTEMSCENE_H
+#ifndef SST_SUNSYSTEMSCENE_H
+#define SST_SUNSYSTEMSCENE_H
 
 #include "graphic_scene.h"
 #include "model_3dobject.h"
 #include "skybox.h"
 
-#include <memory>
 #include <QVector3D>
 #include <QVector2D>
 #include <QMatrix4x4>
@@ -13,9 +12,10 @@
 #include <QOpenGLTexture>
 #include <QPropertyAnimation>
 
+#include <memory>
 
-class SunSystemScene : public GraphicScene
-{
+
+class SunSystemScene : public GraphicScene {
     Q_OBJECT
 
     Q_PROPERTY(float angleByEarthAxis MEMBER angleByEarthAxis)
@@ -69,4 +69,4 @@ private:
 };
 
 
-#endif // SUNSYSTEMSCENE_H
+#endif // SST_SUNSYSTEMSCENE_H

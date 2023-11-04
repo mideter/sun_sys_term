@@ -35,11 +35,11 @@ SunSystemScene::~SunSystemScene()
 
 void SunSystemScene::initializeObjectData()
 {
-    skybox.reset(new Skybox("data/skybox/"));
+    skybox.reset(new Skybox(":data/skybox/"));
 
     ObjFileReader objFileReader;
-    earth3DModel.reset(objFileReader.load("data/Earth/Earth.obj"));
-    moon3DModel.reset(objFileReader.load("data/Moon/Moon.obj"));
+    earth3DModel.reset(objFileReader.load(":data/Earth/Earth.obj"));
+    moon3DModel.reset(objFileReader.load(":data/Moon/Moon.obj"));
 }
 
 
@@ -114,8 +114,8 @@ void SunSystemScene::paint()
     paintObject(vertexBufferForEarthPlanet, textureEarthPlanet.get(), modelViewMatrix);
     GLenum error = GL_NO_ERROR;
     do {
-    error = glGetError();
-    if (error != GL_NO_ERROR)
+        error = glGetError();
+        if (error != GL_NO_ERROR)
             qDebug() << "error occured number " << error;
     } while (error != GL_NO_ERROR);
 
@@ -238,7 +238,7 @@ void SunSystemScene::cameraMove(const QVector3D deltaToMove)
 
 void SunSystemScene::cameraRotateByXYZAxises(const QVector3D &xyzRotate)
 {
-    cameraRotationAnglesXYZInDegrees += xyzRotate;
+    cameraRotationAnglesXYZInDegrees = xyzRotate;
 }
 
 

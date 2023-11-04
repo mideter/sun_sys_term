@@ -1,12 +1,12 @@
 #include "objfile_reader.h"
-#include "sst_exeption.h"
+#include "sst_exception.h"
 
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
 #include <QPixmap>
 
-#include "sst_exeption.h"
+#include "sst_exception.h"
 
 // Возвращает директория файла с символом / в конце.
 QString getFileDirectoryFromFilePath(QString filePath)
@@ -18,7 +18,7 @@ QString getFileDirectoryFromFilePath(QString filePath)
         return match.captured(1);
 
     QString errorMsg = "Error: can't to identify directory path.";
-    throw SstExeption(errorMsg);
+    throw SstException(errorMsg);
 }
 
 
@@ -31,7 +31,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
     if(!materialFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QString errorMsg = QString("Error: can't open %1.").arg(materialFilePath);
-        throw SstExeption(errorMsg);
+        throw SstException(errorMsg);
     }
 
     std::vector<QString> tmp;
@@ -151,7 +151,7 @@ void ObjFileReader::handleFileString(QString fileStr)
         if(std::count(fileStr.begin(), fileStr.end(), ' ') > 3)
         {
             QString errorMsg = QString("Error: face have more that 3 vertexes.");
-            throw SstExeption(errorMsg);
+            throw SstException(errorMsg);
         }
 
         bool textureUse = false;
@@ -167,7 +167,7 @@ void ObjFileReader::handleFileString(QString fileStr)
         else
         {
             QString errorMsg = QString("Error: undefined string of face information.");
-            throw SstExeption(errorMsg);
+            throw SstException(errorMsg);
         }
 
         QVector<VertexObjFile> tmpVec(3);
@@ -250,9 +250,14 @@ QVector<Face3v> ObjFileReader::getFacesForMaterial(const uint matIndex) const
 
 
 Model3DObject* ObjFileReader::load(QString filePath)
+try
 {
     handleFile(filePath);
     return createModel3DObject();
+}
+catch (SstException &ex) {
+    qFatal(ex.what());
+    throw SstException("Не удалось загрузить файл");
 }
 
 
@@ -292,7 +297,7 @@ QVector<QString> ObjFileReader::readFile(QString filePath)
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QString errorMsg = QString("Error: can't to open file (%1)").arg(filePath);
-        throw SstExeption(errorMsg);
+        throw SstException(errorMsg);
     }
 
     QVector<QString> strStore;

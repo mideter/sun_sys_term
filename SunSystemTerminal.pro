@@ -18,7 +18,7 @@ HEADERS += \
     model_3dobject.h \
     objfile_reader.h \
     skybox.h \
-    sst_exeption.h \
+    sst_exception.h \
     sst_window.h \
     sunsystem_scene.h
 

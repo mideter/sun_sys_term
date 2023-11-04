@@ -1,5 +1,5 @@
 #include "model_3dobject.h"
-#include "sst_exeption.h"
+#include "sst_exception.h"
 
 #include <QOpenGLShaderProgram>
 
@@ -131,7 +131,7 @@ float LightInteractingMaterial::getShininess() const
 Face3v::Face3v(const QVector<Vertex> &vertexes)
 {
     if (vertexes.size() != countVertexesInFace)
-        throw SstExeption("Error: face can't include more or less than 3 vertexes.");
+        throw SstException("Error: face can't include more or less than 3 vertexes.");
     // TODO: сделать дополнительные проверки инвариантов класса.
 
     v1 = vertexes[0];

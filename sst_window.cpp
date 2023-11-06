@@ -119,9 +119,10 @@ void Window::keyPressEvent(QKeyEvent *ev)
 
 void Window::setCursorToWindowCenter()
 {
-    QCursor newPositionCursor{ this->cursor() };
-    newPositionCursor.setPos( this->windowCenterInGlobal() );
-    this->setCursor(newPositionCursor);
+    QCursor newCursor{ this->cursor() };
+    newCursor.setPos( this->windowCenterInGlobal() );
+    newCursor.setShape(Qt::CursorShape::BlankCursor);
+    this->setCursor(newCursor);
 }
 
 
@@ -136,10 +137,8 @@ QPoint Window::windowCenterInGlobal() const
 void Window::mouseMoveEvent(QMouseEvent *ev)
 {
     QPointF tmpDifferent = ev->globalPos() - this->windowCenterInGlobal();
-    qDebug() << "движение мыши по y = " << tmpDifferent.y();
-    QVector2D angleRotationsByXYAxises{ static_cast<float>(tmpDifferent.y()), 0} ;// Движение мыши по оси Y соответвует повороту вокруг оси X, и наоборот.
-                                    //    static_cast<float>(tmpDifferent.x()) };
-    qDebug() << "angleRotationsByXYAxises = " << angleRotationsByXYAxises.x();
+    QVector2D angleRotationsByXYAxises{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует повороту вокруг оси X, и наоборот.
+                                        static_cast<float>(tmpDifferent.x()) };
 
     graphicScene->cameraRotateByXYZAxises(angleRotationsByXYAxises * mouseSensetive);
     setCursorToWindowCenter();

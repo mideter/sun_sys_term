@@ -238,7 +238,7 @@ void SunSystemScene::cameraMove(const QVector3D deltaToMove)
 
 void SunSystemScene::cameraRotateByXYZAxises(const QVector3D &xyzRotate)
 {
-    cameraRotationAnglesXYZInDegrees = xyzRotate;
+    cameraRotationAnglesXYZInDegrees += xyzRotate;
 }
 
 

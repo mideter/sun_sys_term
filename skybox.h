@@ -1,5 +1,5 @@
-#ifndef SKYBOX_H
-#define SKYBOX_H
+#ifndef SST_SKYBOX_H
+#define SST_SKYBOX_H
 
 #include "model_3dobject.h"
 
@@ -9,11 +9,6 @@
 
 class Skybox
 {
-private:
-    static const QVector<Vertex> vertexesForQuads;
-    static const QVector<Vertex> vertexes;
-    QVector<QImage> textures;
-
 public:
     Skybox(QString pathToCubTextures);
     ~Skybox() = default;
@@ -22,7 +17,12 @@ public:
     const Vertex* vertexData() const;
 
     const QVector<QImage> getTextures() const;
+
+private:
+    static const QVector<Vertex> vertexesForQuads;
+    static const QVector<Vertex> vertexes;
+    QVector<QImage> textures;
 };
 
 
-#endif // SKYBOX_H
+#endif // SST_SKYBOX_H

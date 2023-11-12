@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QRegularExpression>
 #include <QPixmap>
+#include <QDebug>
 
 #include "sst_exception.h"
 
@@ -100,12 +101,10 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
             QString textureName = tmp[i].section("map_Kd ", 0, 0, QString::SectionSkipEmpty);
 
             int texIndex = textureNames.indexOf(textureName);
-            if (texIndex != -1)
-            {
+            if (texIndex != -1) {
                 texturePix = texturePixmaps[texIndex];
             }
-            else
-            {
+            else {
                 texturePix = QImage(directoryPath + textureName);
                 // TODO: сделать проверку загрузки текстуры.
                 texturePixmaps.push_back(texturePix);
@@ -118,6 +117,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
     if (ismat)
         materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
 }
+
 
 void ObjFileReader::handleFileString(QString fileStr)
 {
@@ -148,24 +148,20 @@ void ObjFileReader::handleFileString(QString fileStr)
         int n[3];
         int t[3];
 
-        if(std::count(fileStr.begin(), fileStr.end(), ' ') > 3)
-        {
+        if(std::count(fileStr.begin(), fileStr.end(), ' ') > 3) {
             QString errorMsg = QString("Error: face have more that 3 vertexes.");
             throw SstException(errorMsg);
         }
 
         bool textureUse = false;
-        if(fileStr.indexOf("//") != -1)
-        {
+        if(fileStr.indexOf("//") != -1) {
             sscanf(fileStr.toStdString().c_str(),"f %d//%d %d//%d %d//%d", &v[0], &n[0],  &v[1], &n[1], &v[2], &n[2] );
         }
-        else if(fileStr.indexOf("/") != -1)
-        {
+        else if(fileStr.indexOf("/") != -1) {
             sscanf(fileStr.toStdString().c_str(),"f %d/%d/%d %d/%d/%d %d/%d/%d", &v[0], &t[0], &n[0],  &v[1], &t[1], &n[1],  &v[2], &t[2], &n[2] );
             textureUse = true;
         }
-        else
-        {
+        else {
             QString errorMsg = QString("Error: undefined string of face information.");
             throw SstException(errorMsg);
         }
@@ -265,9 +261,9 @@ void ObjFileReader::handleFile(QString filePath)
 {
     directoryPath = getFileDirectoryFromFilePath(filePath);
     const QVector<QString> fileStrings = this->readFile(filePath);
+    qDebug() << QString("Strings count in file %1 = %2").arg(filePath).arg(fileStrings.size());
 
-    for(int i = 0; i < fileStrings.size(); i++)
-    {
+    for(int i = 0; i < fileStrings.size(); i++) {
         handleFileString(fileStrings[i]);
     }
 }
@@ -277,8 +273,7 @@ Model3DObject* ObjFileReader::createModel3DObject()
 {
     Model3DObject *M = new Model3DObject();
 
-    for(int i = 0; i < materials.size(); i++)
-    {
+    for(int i = 0; i < materials.size(); i++) {
         someProcessWithMaterial(materials[i], M, i);
     }
 
@@ -294,16 +289,17 @@ Model3DObject* ObjFileReader::createModel3DObject()
 QVector<QString> ObjFileReader::readFile(QString filePath)
 {
     QFile file(filePath);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QString errorMsg = QString("Error: can't to open file (%1)").arg(filePath);
         throw SstException(errorMsg);
     }
 
+    qDebug() << QString("File %1 opened").arg(filePath);
+
     QVector<QString> strStore;
     QTextStream in(&file);
-    while (!in.atEnd())
-    {
+
+    while (!in.atEnd()) {
         QString line = in.readLine();
         strStore.push_back(line);
     }

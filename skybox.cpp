@@ -1,5 +1,4 @@
 #include "skybox.h"
-#include "model_3dobject.h"
 
 #include <QVector>
 #include <QString>
@@ -67,8 +66,7 @@ Skybox::Skybox(QString pathToCubTextures)
     QVector<QString> textureFileNames = { "back.png", "front.png", "left.png"
                                         , "right.png", "up.png", "down.png" };
 
-    for(auto textureName : textureFileNames)
-    {
+    for(auto textureName : textureFileNames) {
         textures.push_back(QImage(pathToCubTextures + textureName));
     }
 }

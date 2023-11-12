@@ -38,7 +38,9 @@ public:
 
 protected:
     void initializeObjectData();
-    void paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *texture, const QMatrix4x4 &mvMatrix);
+    void paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *texture,
+                     const LightInteractingMaterial& material,
+                     const int countVertexes, const QMatrix4x4 &mvMatrix);
     void paintSkybox();
 
 private:

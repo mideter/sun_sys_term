@@ -39,6 +39,9 @@ void SunSystemScene::initializeObjectData()
 
     ObjFileReader objFileReader;
     earth3DModel.reset(objFileReader.load(":data/Earth/Earth.obj"));
+    qDebug() << "Count vertexes in Earth = " << earth3DModel->getCountVertexes();
+    qDebug() << "Earth Image size = " << earth3DModel->getMainTexture().size();
+
     moon3DModel.reset(objFileReader.load(":data/Moon/Moon.obj"));
 }
 
@@ -111,7 +114,7 @@ void SunSystemScene::paint()
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
 
-    paintObject(vertexBufferForEarthPlanet, textureEarthPlanet.get(), modelViewMatrix);
+    paintObject(vertexBufferForEarthPlanet, textureEarthPlanet.get(), earth3DModel->getMainMaterial(), earth3DModel->getCountVertexes(), modelViewMatrix);
     GLenum error = GL_NO_ERROR;
     do {
         error = glGetError();
@@ -123,13 +126,15 @@ void SunSystemScene::paint()
     modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
     modelMatrix.translate(QVector3D(20.0f, 0.0f, 0.0f));
     modelViewMatrix = viewMatrix * modelMatrix;
-    paintObject(vertexBufferForMoonPlanet, textureMoonPlanet.get(), modelViewMatrix);
+    paintObject(vertexBufferForMoonPlanet, textureMoonPlanet.get(), moon3DModel->getMainMaterial(), moon3DModel->getCountVertexes(), modelViewMatrix);
 
     paintSkybox();
 }
 
 
 void SunSystemScene::paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *texture,
+                                 const LightInteractingMaterial& material,
+                                 const int countVertexes,
                                  const QMatrix4x4 &modelViewMatrix)
 {
     shaderProgram->setUniformValue("projectionMatrix", projectionMatrix);
@@ -137,7 +142,7 @@ void SunSystemScene::paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *te
     shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * modelViewMatrix);
     shaderProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
 
-    LightInteractingMaterial mainMaterial = moon3DModel->getMainMaterial();
+    LightInteractingMaterial mainMaterial = material;
     shaderProgram->setUniformValue("mat.ka", mainMaterial.getKa());
     shaderProgram->setUniformValue("mat.kd", mainMaterial.getKd());
     shaderProgram->setUniformValue("mat.ks", mainMaterial.getKs());
@@ -156,7 +161,7 @@ void SunSystemScene::paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *te
     shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
     shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
 
-    glDrawArrays(GL_TRIANGLES, 0, moon3DModel->getCountVertexes() );
+    glDrawArrays(GL_TRIANGLES, 0, countVertexes );
 }
 
 
@@ -175,8 +180,7 @@ void SunSystemScene::paintSkybox()
 
     shaderProgram->setUniformValue("useTexture", true);
     shaderProgram->setUniformValue("useNormal", false);
-    for(int i = 0; i < 6; i++)
-    {
+    for(int i = 0; i < 6; i++) {
         textureSkybox[i]->bind();
         //glDrawArrays(GL_QUADS, i * 6, 6);
         glDrawArrays(GL_TRIANGLES, i * 6, 6);

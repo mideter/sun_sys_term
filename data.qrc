@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>fragment.shader</file>
-        <file>vertex.shader</file>
         <file>data/Earth/Earth.obj</file>
         <file>data/Earth/Earth.mtl</file>
         <file>data/Earth/Earth.png</file>

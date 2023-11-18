@@ -23,10 +23,6 @@ HEADERS += \
 TRANSLATIONS += \
     SunSystemTerminal_en_US.ts
 
-DISTFILES += \
-    fragment.shader \
-    phong.vert \
-    vertex.shader
-
 RESOURCES += \
-    resources.qrc
+    data.qrc \
+    shaders.qrc

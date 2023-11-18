@@ -13,35 +13,35 @@ GraphicScene::~GraphicScene()
 void GraphicScene::initialize()
 {
     initializeOpenGLFunctions();
-    shaderProgram.reset(new QOpenGLShaderProgram(context()));
+    shaderProgram_.reset(new QOpenGLShaderProgram(context()));
 }
 
 
 void GraphicScene::setWindow(sst::Window *window)
 {
-    sceneWindow = window;
+    sceneWindow_ = window;
 }
 
 
-QOpenGLShaderProgram& GraphicScene::getShaderProgram()
+QOpenGLShaderProgram& GraphicScene::shaderProgram()
 {
-    return *shaderProgram;
+    return *shaderProgram_;
 }
 
 
 sst::Window* GraphicScene::window() const
 {
-    return sceneWindow;
+    return sceneWindow_;
 }
 
 
 QOpenGLContext* GraphicScene::context()
 {
-    return sceneWindow ? sceneWindow->context() : nullptr;
+    return sceneWindow_ ? sceneWindow_->context() : nullptr;
 }
 
 
 const QOpenGLContext* GraphicScene::context() const
 {
-    return sceneWindow ? sceneWindow->context() : nullptr;
+    return sceneWindow_ ? sceneWindow_->context() : nullptr;
 }

@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef SST_MAINWINDOW_H
+#define SST_MAINWINDOW_H
 
 #include <QOpenGLWindow>
 #include <QPropertyAnimation>
@@ -26,8 +26,8 @@ public:
     void setScene(SunSystemScene *scene);
 
 protected:
-    const int fpsSetting;
-    int framesCount;
+    const int fpsSetting_;
+    int framesCount_;
 
     void setframesCount(int val);
 
@@ -36,10 +36,10 @@ protected:
     void focusInEvent(QFocusEvent *ev) override;
 
 private:
-    SunSystemScene *graphicScene = nullptr;
-    QOpenGLDebugLogger *openGlDebugLogger = nullptr;
+    SunSystemScene *graphicScene_ = nullptr;
+    QOpenGLDebugLogger *openGlDebugLogger_ = nullptr;
 
-    float mouseSensetive;
+    float mouseSensetive_;
 
     void setCursorToWindowCenter();
     QPoint windowCenterInGlobal() const;
@@ -53,16 +53,18 @@ class MainWindow : public Window
 {
     Q_OBJECT
 
-    Q_PROPERTY(int framesCount MEMBER framesCount WRITE setframesCount)
+    Q_PROPERTY(int framesCount_ MEMBER framesCount_ WRITE setframesCount)
 
 public:
     explicit MainWindow(QWindow *parent = nullptr);
     ~MainWindow() = default;
 
 private:
-    QPropertyAnimation windowUpdateAnimation;
+    QPropertyAnimation windowUpdateAnimation_;
 };
+
 
 } // namespace sst
 
-#endif // MAINWINDOW_H
+
+#endif // SST_MAINWINDOW_H

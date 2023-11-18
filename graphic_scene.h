@@ -1,10 +1,11 @@
-#ifndef GRAPHICSCENE_H
-#define GRAPHICSCENE_H
+#ifndef SST_GRAPHICSCENE_H
+#define SST_GRAPHICSCENE_H
 
-#include <memory>
 #include <QObject>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
+
+#include <memory>
 
 
 namespace sst {
@@ -26,16 +27,17 @@ public:
     sst::Window* window() const;
     QOpenGLContext* context();
     const QOpenGLContext* context() const;
-    QOpenGLShaderProgram& getShaderProgram();
+    QOpenGLShaderProgram& shaderProgram();
 
     virtual void initialize() = 0;
     virtual void paint() = 0;
 
 protected:
-    std::unique_ptr<QOpenGLShaderProgram> shaderProgram = nullptr;
+    std::unique_ptr<QOpenGLShaderProgram> shaderProgram_ = nullptr;
 
 private:
-    sst::Window* sceneWindow = nullptr;
+    sst::Window* sceneWindow_ = nullptr;
 };
 
-#endif // GRAPHICSCENE_H
+
+#endif // SST_GRAPHICSCENE_H

@@ -18,7 +18,7 @@
 class SunSystemScene : public GraphicScene {
     Q_OBJECT
 
-    Q_PROPERTY(float angleByEarthAxis MEMBER angleByEarthAxis)
+    Q_PROPERTY(float angleByEarthAxis_ MEMBER angleByEarthAxis_)
 
 public:
     explicit SunSystemScene();
@@ -44,28 +44,28 @@ protected:
     void paintSkybox();
 
 private:
-    QMatrix4x4 viewMatrix;
-    QMatrix4x4 viewMatrixWithoutTranslate;
-    QMatrix4x4 projectionMatrix;
+    QMatrix4x4 viewMatrix_;
+    QMatrix4x4 viewMatrixWithoutTranslate_;
+    QMatrix4x4 projectionMatrix_;
 
-    std::unique_ptr<Skybox> skybox;
-    std::unique_ptr<Model3DObject> earth3DModel;
-    std::unique_ptr<Model3DObject> moon3DModel;
+    std::unique_ptr<Skybox> skybox_;
+    std::unique_ptr<Model3DObject> earth3dModel_;
+    std::unique_ptr<Model3DObject> moon3dModel_;
 
-    QOpenGLBuffer vertexBufferForEarthPlanet;
-    QOpenGLBuffer vertexBufferForMoonPlanet;
-    QOpenGLBuffer vertexBufferForSkybox;
-    std::unique_ptr<QOpenGLTexture> textureEarthPlanet = nullptr;
-    std::unique_ptr<QOpenGLTexture> textureMoonPlanet = nullptr;
-    std::unique_ptr<QOpenGLTexture> textureSkybox[6];
+    QOpenGLBuffer vertexBufferForEarthPlanet_;
+    QOpenGLBuffer vertexBufferForMoonPlanet_;
+    QOpenGLBuffer vertexBufferForSkybox_;
+    std::unique_ptr<QOpenGLTexture> textureEarthPlanet_ = nullptr;
+    std::unique_ptr<QOpenGLTexture> textureMoonPlanet_ = nullptr;
+    std::unique_ptr<QOpenGLTexture> textureSkybox_[6];
 
-    float angleByEarthAxis;
-    QPropertyAnimation rotationByEarthAxis;
+    float angleByEarthAxis_;
+    QPropertyAnimation rotationByEarthAxis_;
 
-    QVector3D cameraPosition;
-    QVector3D cameraRotationAnglesXYZInDegrees;
+    QVector3D cameraPosition_;
+    QVector3D cameraRotationAnglesXYZInDegrees_;
 
-    float worldStep;
+    float worldStep_;
 
     void cameraMove(const QVector3D deltaToMove);
 };

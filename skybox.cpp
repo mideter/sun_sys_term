@@ -63,11 +63,11 @@ const QVector<Vertex> Skybox::vertexes = {
 
 Skybox::Skybox(QString pathToCubTextures)
 {
-    QVector<QString> textureFileNames = { "back.png", "front.png", "left.png"
-                                        , "right.png", "up.png", "down.png" };
+    QVector<QString> textureFileNames = { "back.png", "front.png", "left.png",
+                                          "right.png", "up.png", "down.png" };
 
     for(auto textureName : textureFileNames) {
-        textures.push_back(QImage(pathToCubTextures + textureName));
+        textures_.push_back(QImage(pathToCubTextures + textureName));
     }
 }
 
@@ -86,5 +86,5 @@ const Vertex* Skybox::vertexData() const
 
 const QVector<QImage> Skybox::getTextures() const
 {
-    return textures;
+    return textures_;
 }

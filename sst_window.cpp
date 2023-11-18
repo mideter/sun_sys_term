@@ -10,21 +10,21 @@ namespace sst {
 
 MainWindow::MainWindow(QWindow *parent)
     : Window(parent)
-    , windowUpdateAnimation(this, "framesCount")
+    , windowUpdateAnimation_(this, "framesCount_")
 {
-    windowUpdateAnimation.setStartValue(1);
-    windowUpdateAnimation.setEndValue(this->fpsSetting);
-    windowUpdateAnimation.setDuration(1000);
-    windowUpdateAnimation.setLoopCount(-1);
-    windowUpdateAnimation.start();
+    windowUpdateAnimation_.setStartValue(1);
+    windowUpdateAnimation_.setEndValue(this->fpsSetting_);
+    windowUpdateAnimation_.setDuration(1000);
+    windowUpdateAnimation_.setLoopCount(-1);
+    windowUpdateAnimation_.start();
 }
 
 
 Window::Window(QWindow *parent)
-    : QOpenGLWindow(NoPartialUpdate, parent)
-    , fpsSetting(60)
-    , openGlDebugLogger{ new QOpenGLDebugLogger(this) }
-    , mouseSensetive(0.1)
+    : QOpenGLWindow(QOpenGLWindow::NoPartialUpdate, parent)
+    , fpsSetting_(60)
+    , openGlDebugLogger_{ new QOpenGLDebugLogger(this) }
+    , mouseSensetive_(0.1)
 {
     QSurfaceFormat surfaceFormat(this->format());
     // Добавляем к формату поверхности уточнение, что используется версия для OpenGL ES.
@@ -44,13 +44,15 @@ Window::Window(QWindow *parent)
 void Window::initializeGL()
 {
     this->makeCurrent(); // make current this window OpenGL context.
-    bool doesOpenGLDebugLoggerInitialize = openGlDebugLogger->initialize(); // in current OpenGL context.
-    qDebug() << "OpenGL debug logger was initialized: " << doesOpenGLDebugLoggerInitialize;
-    connect(openGlDebugLogger, &QOpenGLDebugLogger::messageLogged, this, &MainWindow::handleLoggedMessage);
-    openGlDebugLogger->startLogging();
+    bool hasGlKhrDebug = this->context()->hasExtension(QByteArrayLiteral("GL_KHR_debug"));
+    qDebug() << "sst: OpenGL Error: GL_KHR_debug extension is avaialble: " << hasGlKhrDebug;
+    bool isOpenGLDebugLoggerInitialized = openGlDebugLogger_->initialize(); // in current OpenGL context.
+    qDebug() << "OpenGL debug logger was initialized: " << isOpenGLDebugLoggerInitialized;
+    connect(openGlDebugLogger_, &QOpenGLDebugLogger::messageLogged, this, &MainWindow::handleLoggedMessage);
+    openGlDebugLogger_->startLogging();
 
-    if(graphicScene)
-        graphicScene->initialize();
+    if(graphicScene_)
+        graphicScene_->initialize();
 }
 
 
@@ -62,8 +64,8 @@ void Window::handleLoggedMessage(const QOpenGLDebugMessage &message)
 
 void Window::paintGL()
 {
-    if(graphicScene)
-        graphicScene->paint();
+    if(graphicScene_)
+        graphicScene_->paint();
 }
 
 
@@ -71,7 +73,7 @@ void Window::setframesCount(int val)
 {
     if (val > 0)
     {
-        framesCount = val;
+        framesCount_ = val;
         this->update();
     }
 }
@@ -79,7 +81,7 @@ void Window::setframesCount(int val)
 
 SunSystemScene* Window::scene()
 {
-    return graphicScene;
+    return graphicScene_;
 }
 
 
@@ -89,7 +91,7 @@ void Window::setScene(SunSystemScene *scene)
         return;
 
     scene->setWindow(this);
-    graphicScene = scene;
+    graphicScene_ = scene;
 }
 
 
@@ -103,17 +105,17 @@ void Window::keyPressEvent(QKeyEvent *ev)
     QVector<int> keysToMoveDown{ Qt::Key_X };
 
     if( keysToMoveForward.contains(ev->key()))
-        graphicScene->cameraMoveForward();
+        graphicScene_->cameraMoveForward();
     else if (keysToMoveBack.contains(ev->key()))
-        graphicScene->cameraMoveBack();
+        graphicScene_->cameraMoveBack();
     else if (keysToMoveLeft.contains(ev->key()))
-        graphicScene->cameraMoveLeft();
+        graphicScene_->cameraMoveLeft();
     else if (keysToMoveRight.contains(ev->key()))
-        graphicScene->cameraMoveRight();
+        graphicScene_->cameraMoveRight();
     else if (keysToMoveUp.contains(ev->key()))
-        graphicScene->cameraMoveUp();
+        graphicScene_->cameraMoveUp();
     else if (keysToMoveDown.contains(ev->key()))
-        graphicScene->cameraMoveDown();
+        graphicScene_->cameraMoveDown();
 }
 
 
@@ -140,7 +142,7 @@ void Window::mouseMoveEvent(QMouseEvent *ev)
     QVector2D angleRotationsByXYAxises{ static_cast<float>(tmpDifferent.y()), // Движение мыши по оси Y соответвует повороту вокруг оси X, и наоборот.
                                         static_cast<float>(tmpDifferent.x()) };
 
-    graphicScene->cameraRotateByXYZAxises(angleRotationsByXYAxises * mouseSensetive);
+    graphicScene_->cameraRotateByXYZAxises(angleRotationsByXYAxises * mouseSensetive_);
     setCursorToWindowCenter();
 }
 

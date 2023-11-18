@@ -21,7 +21,8 @@ public:
 private:
     static const QVector<Vertex> vertexesForQuads;
     static const QVector<Vertex> vertexes;
-    QVector<QImage> textures;
+
+    QVector<QImage> textures_;
 };
 
 

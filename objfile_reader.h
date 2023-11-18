@@ -1,5 +1,5 @@
-#ifndef OBJFILELOADERTO3DMODEL_H
-#define OBJFILELOADERTO3DMODEL_H
+#ifndef SST_OBJFILELOADERTO3DMODEL_H
+#define SST_OBJFILELOADERTO3DMODEL_H
 
 #include <QVector>
 #include <QVector2D>
@@ -50,20 +50,12 @@ struct MaterialObjFile
 
 class ObjFileReader
 {
-    QString directoryPath;
+public:
+    explicit ObjFileReader() = default;
 
-    uint currentMaterial;
+    Model3DObject* load(QString filePath);
 
-    QVector<FaceObjFile> faces;
-    QVector<MaterialObjFile> materials;
-
-    QVector<QVector3D> vertexPositions;
-    QVector<QVector2D> vertexTexturePositions;
-    QVector<QVector3D> vertexNormals;
-
-    QVector<QImage> texturePixmaps;
-    QVector<QString> textureNames;
-
+private:
     QVector<QString> readFile(QString filePath);
     void handleFile(QString filePath);
     void handleFileString(QString str);
@@ -73,10 +65,20 @@ class ObjFileReader
 
     Model3DObject *createModel3DObject();
 
-public:
-    explicit ObjFileReader() = default;
+    QString directoryPath_;
 
-    Model3DObject* load(QString filePath);
+    uint currentMaterial_;
+
+    QVector<FaceObjFile> faces_;
+    QVector<MaterialObjFile> materials_;
+
+    QVector<QVector3D> vertexPositions_;
+    QVector<QVector2D> vertexTexturePositions_;
+    QVector<QVector3D> vertexNormals_;
+
+    QVector<QImage> texturePixmaps_;
+    QVector<QString> textureNames_;
 };
 
-#endif // OBJFILELOADERTO3DMODEL_H
+
+#endif // SST_OBJFILELOADERTO3DMODEL_H

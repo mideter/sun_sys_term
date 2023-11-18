@@ -9,6 +9,7 @@
 
 #include "sst_exception.h"
 
+
 // Возвращает директория файла с символом / в конце.
 QString getFileDirectoryFromFilePath(QString filePath)
 {
@@ -26,7 +27,7 @@ QString getFileDirectoryFromFilePath(QString filePath)
 void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
 {
     QString mtlName = materialStr.section("mtllib ", 0, 0, QString::SectionSkipEmpty);
-    QString materialFilePath = directoryPath + mtlName;
+    QString materialFilePath = directoryPath_ + mtlName;
 
     QFile materialFile(materialFilePath);
     if(!materialFile.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -65,7 +66,7 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         if(tmp[i].startsWith("newmtl "))
         {
             if (ismat)
-                materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
+                materials_.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
 
             ismat = false;
             isPlane = false;
@@ -100,22 +101,22 @@ void ObjFileReader::readStringWithMaterialInfo(QString materialStr)
         {
             QString textureName = tmp[i].section("map_Kd ", 0, 0, QString::SectionSkipEmpty);
 
-            int texIndex = textureNames.indexOf(textureName);
+            int texIndex = textureNames_.indexOf(textureName);
             if (texIndex != -1) {
-                texturePix = texturePixmaps[texIndex];
+                texturePix = texturePixmaps_[texIndex];
             }
             else {
-                texturePix = QImage(directoryPath + textureName);
+                texturePix = QImage(directoryPath_ + textureName);
                 // TODO: сделать проверку загрузки текстуры.
-                texturePixmaps.push_back(texturePix);
-                textureNames.push_back(textureName);
+                texturePixmaps_.push_back(texturePix);
+                textureNames_.push_back(textureName);
             }
             ismat = true;
         }
     }
 
     if (ismat)
-        materials.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
+        materials_.push_back(MaterialObjFile{ materialName, alpha, ns, ni, dif, amb, spec, emis, illum, texturePix, isPlane });
 }
 
 
@@ -128,19 +129,19 @@ void ObjFileReader::handleFileString(QString fileStr)
     {
         float tmpx, tmpy, tmpz;
         sscanf(fileStr.toStdString().c_str(), "v %f %f %f", &tmpx,&tmpy,&tmpz);
-        vertexPositions.push_back(QVector3D(tmpx, tmpy, tmpz));
+        vertexPositions_.push_back(QVector3D(tmpx, tmpy, tmpz));
     }
     else if(fileStr.startsWith("vt "))
     {
         float tmpx, tmpy;
         sscanf(fileStr.toStdString().c_str(), "vt %f %f", &tmpx, &tmpy);
-        vertexTexturePositions.push_back(QVector2D{tmpx, tmpy});
+        vertexTexturePositions_.push_back(QVector2D{tmpx, tmpy});
     }
     else if(fileStr.startsWith("vn "))
     {
         float tmpx, tmpy, tmpz;
         sscanf(fileStr.toStdString().c_str(), "vn %f %f %f", &tmpx,&tmpy,&tmpz);
-        vertexNormals.push_back(QVector3D(tmpx, tmpy, tmpz));
+        vertexNormals_.push_back(QVector3D(tmpx, tmpy, tmpz));
     }
     else if(fileStr.startsWith("f "))
     {
@@ -182,7 +183,7 @@ void ObjFileReader::handleFileString(QString fileStr)
             tmpVec[2].texturePositionId = t[2];
         }
 
-        faces.push_back(FaceObjFile{ tmpVec, currentMaterial });
+        faces_.push_back(FaceObjFile{ tmpVec, currentMaterial_ });
     }
     else if(fileStr.startsWith("mtllib "))
         readStringWithMaterialInfo(fileStr);
@@ -190,11 +191,11 @@ void ObjFileReader::handleFileString(QString fileStr)
     {
         QString tmp = fileStr.section("usemtl ", 0, 0, QString::SectionSkipEmpty);
 
-        for( int j = 0; j < materials.size(); j++)
+        for( int j = 0; j < materials_.size(); j++)
         {
-            if(materials[j].name == tmp)
+            if(materials_[j].name == tmp)
             {
-                currentMaterial = j;
+                currentMaterial_ = j;
                 break;
             }
         }
@@ -212,11 +213,11 @@ void ObjFileReader::someProcessWithMaterial(const MaterialObjFile &material, Mod
     // TODO: нужно сделать, чтобы работало более, чем с одной текстурой в 3д модели.
     SurfaceWithOneMaterial surfaceWithOneMaterial( LightInteractingMaterial{ am, di, sp, em, material.ns },
                                                    getFacesForMaterial(matIndex),
-                                                   texturePixmaps[0] );
+                                                   texturePixmaps_[0] );
 
-    vertexPositions.clear();
-    vertexTexturePositions.clear();
-    vertexNormals.clear();
+    vertexPositions_.clear();
+    vertexTexturePositions_.clear();
+    vertexNormals_.clear();
 
     M->addSurface(surfaceWithOneMaterial);
 }
@@ -225,16 +226,16 @@ void ObjFileReader::someProcessWithMaterial(const MaterialObjFile &material, Mod
 QVector<Face3v> ObjFileReader::getFacesForMaterial(const uint matIndex) const
 {
     QVector<Face3v> facesOfOneMaterial;
-    for (auto objFace : faces)
+    for (auto objFace : faces_)
     {
         if (objFace.materialId == matIndex)
         {
             QVector<Vertex> tmpVertexVector;
             for(int i = 0; i < 3; i++)
             {
-                QVector3D position = vertexPositions[ objFace.vertexes[i].positionId - 1 ];
-                QVector2D texturePosition = vertexTexturePositions[ objFace.vertexes[i].texturePositionId - 1 ];
-                QVector3D normal = vertexNormals[ objFace.vertexes[i].normalId - 1 ];
+                QVector3D position = vertexPositions_[ objFace.vertexes[i].positionId - 1 ];
+                QVector2D texturePosition = vertexTexturePositions_[ objFace.vertexes[i].texturePositionId - 1 ];
+                QVector3D normal = vertexNormals_[ objFace.vertexes[i].normalId - 1 ];
                 tmpVertexVector.push_back( Vertex{ position, texturePosition, normal } );
             }
 
@@ -259,7 +260,7 @@ catch (SstException &ex) {
 
 void ObjFileReader::handleFile(QString filePath)
 {
-    directoryPath = getFileDirectoryFromFilePath(filePath);
+    directoryPath_ = getFileDirectoryFromFilePath(filePath);
     const QVector<QString> fileStrings = this->readFile(filePath);
     qDebug() << QString("Strings count in file %1 = %2").arg(filePath).arg(fileStrings.size());
 
@@ -273,14 +274,14 @@ Model3DObject* ObjFileReader::createModel3DObject()
 {
     Model3DObject *M = new Model3DObject();
 
-    for(int i = 0; i < materials.size(); i++) {
-        someProcessWithMaterial(materials[i], M, i);
+    for(int i = 0; i < materials_.size(); i++) {
+        someProcessWithMaterial(materials_[i], M, i);
     }
 
-    faces.clear();
-    materials.clear();
-    texturePixmaps.clear();
-    textureNames.clear();
+    faces_.clear();
+    materials_.clear();
+    texturePixmaps_.clear();
+    textureNames_.clear();
 
     return M;
 }

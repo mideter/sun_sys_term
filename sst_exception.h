@@ -8,16 +8,16 @@ class SstException : public QException
 {
 public:
     SstException(QString msg)
-        : msg(msg.toStdString())
+        : msg_(msg.toStdString())
     {}
 
     const char* what() const noexcept override
     {
-        return msg.c_str();
+        return msg_.c_str();
     }
 
 private:
-    std::string msg;
+    std::string msg_;
 
 };
 

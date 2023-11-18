@@ -7,22 +7,24 @@
 
 SunSystemScene::SunSystemScene()
     : GraphicScene()
-    , vertexBufferForMoonPlanet(QOpenGLBuffer::VertexBuffer)
-    , vertexBufferForSkybox(QOpenGLBuffer::VertexBuffer)
-    , rotationByEarthAxis(this, "angleByEarthAxis")
-    , cameraPosition( 0.0f, 0.0f, 25.0f)
-    , cameraRotationAnglesXYZInDegrees(0.0f, 0.0f, 0.0f)
-    , worldStep(0.5f)
+    , vertexBufferForEarthPlanet_(QOpenGLBuffer::VertexBuffer)
+    , vertexBufferForMoonPlanet_(QOpenGLBuffer::VertexBuffer)
+    , vertexBufferForSkybox_(QOpenGLBuffer::VertexBuffer)
+    , rotationByEarthAxis_(this, "angleByEarthAxis_")
+    , cameraPosition_( 0.0f, 0.0f, 25.0f)
+    , cameraRotationAnglesXYZInDegrees_(0.0f, 0.0f, 0.0f)
+    , worldStep_(0.5f)
 {
-    vertexBufferForMoonPlanet.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vertexBufferForSkybox.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vertexBufferForEarthPlanet_.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vertexBufferForMoonPlanet_.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vertexBufferForSkybox_.setUsagePattern(QOpenGLBuffer::StaticDraw);
     initializeObjectData();
 
-    rotationByEarthAxis.setStartValue(0);
-    rotationByEarthAxis.setEndValue(359);
-    rotationByEarthAxis.setDuration(180000);
-    rotationByEarthAxis.setLoopCount(-1);
-    rotationByEarthAxis.start();
+    rotationByEarthAxis_.setStartValue(0);
+    rotationByEarthAxis_.setEndValue(359);
+    rotationByEarthAxis_.setDuration(180000);
+    rotationByEarthAxis_.setLoopCount(-1);
+    rotationByEarthAxis_.start();
 }
 
 
@@ -35,14 +37,16 @@ SunSystemScene::~SunSystemScene()
 
 void SunSystemScene::initializeObjectData()
 {
-    skybox.reset(new Skybox(":data/skybox/"));
+    skybox_.reset(new Skybox(":data/skybox/"));
 
     ObjFileReader objFileReader;
-    earth3DModel.reset(objFileReader.load(":data/Earth/Earth.obj"));
-    qDebug() << "Count vertexes in Earth = " << earth3DModel->getCountVertexes();
-    qDebug() << "Earth Image size = " << earth3DModel->getMainTexture().size();
+    earth3dModel_.reset(objFileReader.load(":data/Earth/Earth.obj"));
+    qDebug() << "Count vertexes in Earth = " << earth3dModel_->countVertexes();
+    qDebug() << "Earth Image size = " << earth3dModel_->mainTexture().size();
 
-    moon3DModel.reset(objFileReader.load(":data/Moon/Moon.obj"));
+    moon3dModel_.reset(objFileReader.load(":data/Moon/Moon.obj"));
+    qDebug() << "Count vertexes in Moon = " << earth3dModel_->countVertexes();
+    qDebug() << "Moon Image size = " << earth3dModel_->mainTexture().size();
 }
 
 
@@ -52,53 +56,53 @@ void SunSystemScene::initialize()
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.8, 0.9, 0.8, 1.0);
 
-    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":vertex.shader");
-    shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":fragment.shader");
-    shaderProgram->link();
+    shaderProgram_->addShaderFromSourceFile(QOpenGLShader::Vertex, ":vertex.shader");
+    shaderProgram_->addShaderFromSourceFile(QOpenGLShader::Fragment, ":fragment.shader");
+    shaderProgram_->link();
 
-    shaderProgram->bind();
+    shaderProgram_->bind();
 
-    vertexBufferForEarthPlanet.create();
-    vertexBufferForEarthPlanet.bind();
-    vertexBufferForEarthPlanet.allocate(earth3DModel->vertexData(), sizeof(Vertex) * earth3DModel->getCountVertexes());
+    vertexBufferForEarthPlanet_.create();
+    vertexBufferForEarthPlanet_.bind();
+    vertexBufferForEarthPlanet_.allocate(earth3dModel_->vertexData(), sizeof(Vertex) * earth3dModel_->countVertexes());
 
-    vertexBufferForMoonPlanet.create();
-    vertexBufferForMoonPlanet.bind(); // bind() must be called before allocate()
-    vertexBufferForMoonPlanet.allocate(moon3DModel->vertexData(), sizeof(Vertex) * moon3DModel->getCountVertexes());
+    vertexBufferForMoonPlanet_.create();
+    vertexBufferForMoonPlanet_.bind(); // bind() must be called before allocate()
+    vertexBufferForMoonPlanet_.allocate(moon3dModel_->vertexData(), sizeof(Vertex) * moon3dModel_->countVertexes());
 
-    vertexBufferForSkybox.create();
-    vertexBufferForSkybox.bind();
-    vertexBufferForSkybox.allocate(skybox->vertexData(), sizeof(Vertex) * skybox->getCountVertexes());
+    vertexBufferForSkybox_.create();
+    vertexBufferForSkybox_.bind();
+    vertexBufferForSkybox_.allocate(skybox_->vertexData(), sizeof(Vertex) * skybox_->getCountVertexes());
 
-    textureEarthPlanet.reset( new QOpenGLTexture{ earth3DModel->getMainTexture().mirrored() });
-    textureEarthPlanet->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    textureEarthPlanet->setMagnificationFilter(QOpenGLTexture::Linear);
+    textureEarthPlanet_.reset( new QOpenGLTexture{ earth3dModel_->mainTexture().mirrored() });
+    textureEarthPlanet_->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    textureEarthPlanet_->setMagnificationFilter(QOpenGLTexture::Linear);
 
-    textureMoonPlanet.reset( new QOpenGLTexture{ moon3DModel->getMainTexture().mirrored() } );
-    textureMoonPlanet->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    textureMoonPlanet->setMagnificationFilter(QOpenGLTexture::Linear);
+    textureMoonPlanet_.reset( new QOpenGLTexture{ moon3dModel_->mainTexture().mirrored() } );
+    textureMoonPlanet_->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    textureMoonPlanet_->setMagnificationFilter(QOpenGLTexture::Linear);
 
     for (int i = 0; i < 6; i++)
     {
-        textureSkybox[i].reset( new QOpenGLTexture{ skybox->getTextures()[i].mirrored() } );
-        textureSkybox[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-        textureSkybox[i]->setMagnificationFilter(QOpenGLTexture::Linear);
+        textureSkybox_[i].reset( new QOpenGLTexture{ skybox_->getTextures()[i].mirrored() } );
+        textureSkybox_[i]->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        textureSkybox_[i]->setMagnificationFilter(QOpenGLTexture::Linear);
     }
 }
 
 
 void SunSystemScene::paint()
 {
-    projectionMatrix.setToIdentity();
+    projectionMatrix_.setToIdentity();
     float aspectRatio = qreal(window()->width()) / window()->height();
-    projectionMatrix.perspective(45.0f, aspectRatio, 0.1, 10000.0f);
+    projectionMatrix_.perspective(45.0f, aspectRatio, 0.1, 10000.0f);
 
-    viewMatrixWithoutTranslate.setToIdentity();
-    viewMatrixWithoutTranslate.rotate(cameraRotationAnglesXYZInDegrees[0], QVector3D{ 1, 0, 0 });
-    viewMatrixWithoutTranslate.rotate(cameraRotationAnglesXYZInDegrees[1], QVector3D{ 0, 1, 0 });
+    viewMatrixWithoutTranslate_.setToIdentity();
+    viewMatrixWithoutTranslate_.rotate(cameraRotationAnglesXYZInDegrees_[0], QVector3D{ 1, 0, 0 });
+    viewMatrixWithoutTranslate_.rotate(cameraRotationAnglesXYZInDegrees_[1], QVector3D{ 0, 1, 0 });
    // viewMatrix.rotate(cameraRatationAnglesXYZ[2], QVector3D{ 0, 0, 1});
-    viewMatrix = viewMatrixWithoutTranslate;
-    viewMatrix.translate(-cameraPosition); // Относительно камеры все объекты имеют инвертированное положение.
+    viewMatrix_ = viewMatrixWithoutTranslate_;
+    viewMatrix_.translate(-cameraPosition_); // Относительно камеры все объекты имеют инвертированное положение.
     // Матричные преобразования идут в обратном вызовам функций порядке.
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -107,14 +111,14 @@ void SunSystemScene::paint()
     glEnable(GL_CULL_FACE); // Включаем отсечение граней.
     glCullFace(GL_BACK); // Устанавливаем отсечение граней, обращенных к наблюдателю нелицевой стороной.
 
-    shaderProgram->setUniformValue("light.position", QVector3D{ viewMatrix * QVector4D(6, 6, 16, 1)} );
-    shaderProgram->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
+    shaderProgram_->setUniformValue("light.position", QVector3D{ viewMatrix_ * QVector4D(6, 6, 16, 1)} );
+    shaderProgram_->setUniformValue("light.intensity", QVector3D(1.0f, 1.0f, 1.0f));
 
     QMatrix4x4 modelMatrix;
-    modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
-    QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
+    modelMatrix.rotate(angleByEarthAxis_, QVector3D{0, 1, 0});
+    QMatrix4x4 modelViewMatrix = viewMatrix_ * modelMatrix;
 
-    paintObject(vertexBufferForEarthPlanet, textureEarthPlanet.get(), earth3DModel->getMainMaterial(), earth3DModel->getCountVertexes(), modelViewMatrix);
+    paintObject(vertexBufferForEarthPlanet_, textureEarthPlanet_.get(), earth3dModel_->mainMaterial(), earth3dModel_->countVertexes(), modelViewMatrix);
     GLenum error = GL_NO_ERROR;
     do {
         error = glGetError();
@@ -123,10 +127,10 @@ void SunSystemScene::paint()
     } while (error != GL_NO_ERROR);
 
     modelMatrix.setToIdentity();
-    modelMatrix.rotate(angleByEarthAxis, QVector3D{0, 1, 0});
+    modelMatrix.rotate(angleByEarthAxis_, QVector3D{0, 1, 0});
     modelMatrix.translate(QVector3D(20.0f, 0.0f, 0.0f));
-    modelViewMatrix = viewMatrix * modelMatrix;
-    paintObject(vertexBufferForMoonPlanet, textureMoonPlanet.get(), moon3DModel->getMainMaterial(), moon3DModel->getCountVertexes(), modelViewMatrix);
+    modelViewMatrix = viewMatrix_ * modelMatrix;
+    paintObject(vertexBufferForMoonPlanet_, textureMoonPlanet_.get(), moon3dModel_->mainMaterial(), moon3dModel_->countVertexes(), modelViewMatrix);
 
     paintSkybox();
 }
@@ -137,29 +141,29 @@ void SunSystemScene::paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *te
                                  const int countVertexes,
                                  const QMatrix4x4 &modelViewMatrix)
 {
-    shaderProgram->setUniformValue("projectionMatrix", projectionMatrix);
-    shaderProgram->setUniformValue("modelViewMatrix", modelViewMatrix);
-    shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * modelViewMatrix);
-    shaderProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
+    shaderProgram_->setUniformValue("projectionMatrix", projectionMatrix_);
+    shaderProgram_->setUniformValue("modelViewMatrix", modelViewMatrix);
+    shaderProgram_->setUniformValue("modelViewProjectionMatrix", projectionMatrix_ * modelViewMatrix);
+    shaderProgram_->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
 
     LightInteractingMaterial mainMaterial = material;
-    shaderProgram->setUniformValue("mat.ka", mainMaterial.getKa());
-    shaderProgram->setUniformValue("mat.kd", mainMaterial.getKd());
-    shaderProgram->setUniformValue("mat.ks", mainMaterial.getKs());
-    shaderProgram->setUniformValue("mat.shininess", mainMaterial.getShininess());
+    shaderProgram_->setUniformValue("mat.ka", mainMaterial.ka());
+    shaderProgram_->setUniformValue("mat.kd", mainMaterial.kd());
+    shaderProgram_->setUniformValue("mat.ks", mainMaterial.ks());
+    shaderProgram_->setUniformValue("mat.shininess", mainMaterial.shininess());
 
     vertexBuffer.bind();
     texture->bind();
-    shaderProgram->setUniformValue("useTexture", true);
-    shaderProgram->setUniformValue("useNormal", true);
+    shaderProgram_->setUniformValue("useTexture", true);
+    shaderProgram_->setUniformValue("useNormal", true);
 
-    shaderProgram->enableAttributeArray("vertexPosition");
-    shaderProgram->enableAttributeArray("vertexNormal");
-    shaderProgram->enableAttributeArray("vertexTextureCoord");
+    shaderProgram_->enableAttributeArray("vertexPosition");
+    shaderProgram_->enableAttributeArray("vertexNormal");
+    shaderProgram_->enableAttributeArray("vertexTextureCoord");
 
-    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
+    shaderProgram_->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::positionAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram_->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::normalAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram_->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::textureCoordsAttribOffset(), 2, sizeof(Vertex));
 
     glDrawArrays(GL_TRIANGLES, 0, countVertexes );
 }
@@ -167,21 +171,21 @@ void SunSystemScene::paintObject(QOpenGLBuffer &vertexBuffer, QOpenGLTexture *te
 
 void SunSystemScene::paintSkybox()
 {
-    shaderProgram->setUniformValue("modelViewProjectionMatrix", projectionMatrix * viewMatrixWithoutTranslate);
+    shaderProgram_->setUniformValue("modelViewProjectionMatrix", projectionMatrix_ * viewMatrixWithoutTranslate_);
 
-    vertexBufferForSkybox.bind();
-    shaderProgram->enableAttributeArray("vertexPosition");
-    shaderProgram->enableAttributeArray("vertexNormal");
-    shaderProgram->enableAttributeArray("vertexTextureCoord");
+    vertexBufferForSkybox_.bind();
+    shaderProgram_->enableAttributeArray("vertexPosition");
+    shaderProgram_->enableAttributeArray("vertexNormal");
+    shaderProgram_->enableAttributeArray("vertexTextureCoord");
 
-    shaderProgram->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::getPositionAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::getNormalAttribOffset(), 3, sizeof(Vertex));
-    shaderProgram->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::getTextureCoordsAttribOffset(), 2, sizeof(Vertex));
+    shaderProgram_->setAttributeBuffer("vertexPosition", GL_FLOAT, Vertex::positionAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram_->setAttributeBuffer("vertexNormal", GL_FLOAT, Vertex::normalAttribOffset(), 3, sizeof(Vertex));
+    shaderProgram_->setAttributeBuffer("vertexTextureCoord", GL_FLOAT, Vertex::textureCoordsAttribOffset(), 2, sizeof(Vertex));
 
-    shaderProgram->setUniformValue("useTexture", true);
-    shaderProgram->setUniformValue("useNormal", false);
+    shaderProgram_->setUniformValue("useTexture", true);
+    shaderProgram_->setUniformValue("useNormal", false);
     for(int i = 0; i < 6; i++) {
-        textureSkybox[i]->bind();
+        textureSkybox_[i]->bind();
         //glDrawArrays(GL_QUADS, i * 6, 6);
         glDrawArrays(GL_TRIANGLES, i * 6, 6);
     }
@@ -190,59 +194,59 @@ void SunSystemScene::paintSkybox()
 
 void SunSystemScene::cameraMoveForward()
 {
-    float zMove = -worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
-    float xMove = worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
+    float zMove = -worldStep_ * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]));
+    float xMove = worldStep_ * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]));
     cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
 void SunSystemScene::cameraMoveBack()
 {
-    float zMove = worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
-    float xMove = -worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]));
+    float zMove = worldStep_ * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]));
+    float xMove = -worldStep_ * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]));
     cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
 void SunSystemScene::cameraMoveLeft()
 {
-    float zMove = worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
-    float xMove = -worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
+    float zMove = worldStep_ * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]) + M_PI_2);
+    float xMove = -worldStep_ * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]) + M_PI_2);
     cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
 void SunSystemScene::cameraMoveRight()
 {
-    float zMove = -worldStep * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
-    float xMove = worldStep * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees[1]) + M_PI_2);
+    float zMove = -worldStep_ * qCos(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]) + M_PI_2);
+    float xMove = worldStep_ * qSin(qDegreesToRadians(cameraRotationAnglesXYZInDegrees_[1]) + M_PI_2);
     cameraMove(QVector3D( xMove, 0.0f, zMove));
 }
 
 
 void SunSystemScene::cameraMoveUp()
 {
-    float yMove = worldStep;
+    float yMove = worldStep_;
     cameraMove(QVector3D(0.0f, yMove, 0.0f));
 }
 
 
 void SunSystemScene::cameraMoveDown()
 {
-    float yMove = -worldStep;
+    float yMove = -worldStep_;
     cameraMove(QVector3D(0.0f, yMove, 0.0f));
 }
 
 
 void SunSystemScene::cameraMove(const QVector3D deltaToMove)
 {
-    cameraPosition += deltaToMove;
+    cameraPosition_ += deltaToMove;
 }
 
 
 void SunSystemScene::cameraRotateByXYZAxises(const QVector3D &xyzRotate)
 {
-    cameraRotationAnglesXYZInDegrees += xyzRotate;
+    cameraRotationAnglesXYZInDegrees_ += xyzRotate;
 }
 
 

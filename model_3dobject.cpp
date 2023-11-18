@@ -6,43 +6,44 @@
 
 void Model3DObject::addSurface(const SurfaceWithOneMaterial &surface)
 {
-    surfaces.push_back(surface);
-}
-
-std::size_t Model3DObject::getCountVertexes() const
-{
-    return surfaces[0].getCountVertexes();
+    surfaces_.push_back(surface);
 }
 
 
-LightInteractingMaterial Model3DObject::getMainMaterial() const
+std::size_t Model3DObject::countVertexes() const
 {
-    return surfaces[0].getMaterial();
+    return surfaces_[0].countVertexes();
 }
 
 
-QImage Model3DObject::getMainTexture() const
+LightInteractingMaterial Model3DObject::mainMaterial() const
 {
-    return surfaces[0].getTexture();
+    return surfaces_[0].material();
+}
+
+
+QImage Model3DObject::mainTexture() const
+{
+    return surfaces_[0].texture();
 }
 
 
 Vertex* Model3DObject::vertexData()
 {
-    return surfaces[0].vertexData();
+    return surfaces_[0].vertexData();
 }
 
 
 SurfaceWithOneMaterial::SurfaceWithOneMaterial(const LightInteractingMaterial &material)
-    : material(material)
+    : material_(material)
 {}
 
 
 SurfaceWithOneMaterial::SurfaceWithOneMaterial(const LightInteractingMaterial &material, const QVector<Face3v> &faces,
                                                const QImage &texture)
-    : material(material)
-    , faces(faces)
-    , texture(texture)
+    : material_(material)
+    , faces_(faces)
+    , texture_(texture)
 {
     // TODO сделать проверку инварианта.
 }
@@ -50,87 +51,87 @@ SurfaceWithOneMaterial::SurfaceWithOneMaterial(const LightInteractingMaterial &m
 
 void SurfaceWithOneMaterial::setMaterial(const LightInteractingMaterial &material)
 {
-    this->material = material;
+    this->material_ = material;
 }
 
 
 void SurfaceWithOneMaterial::setTexture(const QImage &texture)
 {
-    this->texture = texture;
+    this->texture_ = texture;
 }
 
 
 void SurfaceWithOneMaterial::addFace(const Face3v &face)
 {
-    faces.push_back(face);
+    faces_.push_back(face);
 }
 
 
-int SurfaceWithOneMaterial::getCountVertexes() const
+int SurfaceWithOneMaterial::countVertexes() const
 {
-    return faces.size() * Face3v::getCountVertexes();
+    return faces_.size() * Face3v::countVertexes();
 }
 
 
-LightInteractingMaterial SurfaceWithOneMaterial::getMaterial() const
+LightInteractingMaterial SurfaceWithOneMaterial::material() const
 {
-    return material;
+    return material_;
 }
 
 
-QImage SurfaceWithOneMaterial::getTexture() const
+QImage SurfaceWithOneMaterial::texture() const
 {
-    return texture;
+    return texture_;
 }
 
 
 Vertex* SurfaceWithOneMaterial::vertexData()
 {
-    return faces[0].vertexData();
+    return faces_[0].vertexData();
 }
 
 
 LightInteractingMaterial::LightInteractingMaterial(const QVector3D &Ka, const QVector3D &Kd,
                              const QVector3D &Ks, const QVector3D &Ke, float shininess)
-    : Ka(Ka), Kd(Kd), Ks(Ks), Ke(Ke), shininess(shininess)
+    : ka_(Ka),kd_(Kd),ks_(Ks), ke_(Ke), shininess_(shininess)
 {
     // TODO: сделать проверку инвариантов класса.
 }
 
 
-QVector3D LightInteractingMaterial::getKa() const
+QVector3D LightInteractingMaterial::ka() const
 {
-    return Ka;
+    return ka_;
 }
 
 
-QVector3D LightInteractingMaterial::getKd() const
+QVector3D LightInteractingMaterial::kd() const
 {
-    return Kd;
+    return kd_;
 }
 
 
-QVector3D LightInteractingMaterial::getKs() const
+QVector3D LightInteractingMaterial::ks() const
 {
-    return Ks;
+    return ks_;
 }
 
 
-QVector3D LightInteractingMaterial::getKe() const
+QVector3D LightInteractingMaterial::ke() const
 {
-    return Ke;
+    return ke_;
 }
 
 
-float LightInteractingMaterial::getShininess() const
+float LightInteractingMaterial::shininess() const
 {
-    return shininess;
+    return shininess_;
 }
 
 // Вершины должны передаваться в порядке обхода против часовой стрелки.
 Face3v::Face3v(const QVector<Vertex> &vertexes)
 {
-    if (vertexes.size() != countVertexesInFace)
+    if (vertexes.size() != countVertexesInFace_)
         throw SstException("Error: face can't include more or less than 3 vertexes.");
     // TODO: сделать дополнительные проверки инвариантов класса.
 
@@ -148,9 +149,9 @@ Face3v::Face3v(const Vertex &v1, const Vertex &v2, const Vertex &v3)
 }
 
 
-int Face3v::getCountVertexes()
+int Face3v::countVertexes()
 {
-    return countVertexesInFace;
+    return countVertexesInFace_;
 }
 
 
@@ -161,31 +162,31 @@ Vertex* Face3v::vertexData()
 
 
 Vertex::Vertex(const QVector3D &position, const QVector2D &texturePosition, const QVector3D &normal)
-    : position(position)
-    , texturePosition(texturePosition)
-    , normal(normal)
+    : position_(position)
+    , texturePosition_(texturePosition)
+    , normal_(normal)
 {
     // TODO: сделать проверку инвариантов класса.
 }
 
 
-int Vertex::getPositionAttribOffset()
+int Vertex::positionAttribOffset()
 {
     Vertex tmp;
-    return reinterpret_cast<long>(&tmp.position) - reinterpret_cast<long>(&tmp);
+    return reinterpret_cast<long>(&tmp.position_) - reinterpret_cast<long>(&tmp);
 }
 
 
-int Vertex::getTextureCoordsAttribOffset()
+int Vertex::textureCoordsAttribOffset()
 {
     Vertex tmp;
-    return reinterpret_cast<long>(&tmp.texturePosition) - reinterpret_cast<long>(&tmp);
+    return reinterpret_cast<long>(&tmp.texturePosition_) - reinterpret_cast<long>(&tmp);
 }
 
 
-int Vertex::getNormalAttribOffset()
+int Vertex::normalAttribOffset()
 {
     Vertex tmp;
-    return reinterpret_cast<long>(&tmp.normal) - reinterpret_cast<long>(&tmp);
+    return reinterpret_cast<long>(&tmp.normal_) - reinterpret_cast<long>(&tmp);
 }
 
